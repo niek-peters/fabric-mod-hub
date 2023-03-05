@@ -1,12 +1,24 @@
 <script lang="ts">
 	import '$src/app.css';
 
-	import Navbar from '$components/Navbar.svelte';
+	import Titlebar from '$components/Titlebar.svelte';
+	import Transition from '$components/Transition.svelte';
+	import Navbar from '$components/navbar/Navbar.svelte';
+	import type { LayoutData } from './$types';
+
+	export let data: LayoutData;
 </script>
 
-<div class="flex w-screen h-screen bg-zinc-800 text-slate-50">
+<Titlebar />
+<div class="flex mt-8 w-screen bg-zinc-800 text-slate-50">
 	<Navbar />
-	<main class="flex flex-col flex-grow h-screen p-4">
+	<Transition url={data.url}>
 		<slot />
-	</main>
+	</Transition>
 </div>
+
+<style>
+	div {
+		height: calc(100vh - 2rem);
+	}
+</style>

@@ -1,19 +1,13 @@
-<script>
+<script lang="ts">
 	import Fa from 'svelte-fa';
-	import {
-		faCaretRight,
-		faGear,
-		faHome,
-		faMagnifyingGlass,
-		faPlus
-	} from '@fortawesome/free-solid-svg-icons';
+	import { faGear, faHome, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 	import Line from '$components/Line.svelte';
-	import NavButton from '$components/NavButton.svelte';
-	import ModButton from '$components/ModButton.svelte';
+	import NavButton from '$components/navbar/NavButton.svelte';
+	import ModButton from '$components/navbar/ModButton.svelte';
 </script>
 
-<nav class="flex flex-col w-64 h-screen bg-zinc-700/30 p-4">
+<nav class="flex flex-col w-fit h-full bg-zinc-700/30 p-4">
 	<section class="flex flex-col gap-6">
 		<NavButton icon={faHome} text="Home" href="/" />
 		<Line />

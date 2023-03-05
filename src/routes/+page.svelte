@@ -6,7 +6,7 @@
 	import { faGithub } from '@fortawesome/free-brands-svg-icons';
 </script>
 
-<div class="flex flex-col flex-grow gap-8">
+<div class="flex flex-col flex-grow w-full gap-8">
 	<section class="relative flex items-center justify-center h-72 py-8 overflow-hidden rounded-md">
 		<img class="absolute brightness-75 z-10" src="background-1.webp" alt="Minecraft background" />
 		<img class="h-full brightness-75 shadow-2xl z-20" src="favicon.svg" alt="Fabric Mod Hub icon" />
@@ -25,11 +25,14 @@
 				</section>
 			</section>
 			<section class="flex flex-col gap-4 w-1/3">
-				<button class="flex items-center gap-4 px-4 flex-grow bg-indigo-800 rounded-md shadow-2xl"
+				<a
+					href="/packs/1"
+					class="flex items-center gap-4 px-4 flex-grow bg-indigo-800 hover:bg-indigo-900 long-transition rounded-md shadow-2xl"
 					><Fa class="text-lg" icon={faUpRightFromSquare} />
-					<p>View</p></button
+					<p>View</p></a
 				>
-				<button class="flex items-center gap-4 px-4 flex-grow bg-rose-900 rounded-md shadow-2xl"
+				<button
+					class="flex items-center gap-4 px-4 flex-grow bg-rose-800 hover:bg-rose-900 long-transition rounded-md shadow-2xl"
 					><Fa class="text-lg" icon={faMinus} />
 					<p>Unload</p></button
 				>
@@ -38,7 +41,7 @@
 	</article>
 	<section class="flex mt-auto justify-end h-fit">
 		<button
-			class="flex gap-2 items-center"
+			class="flex gap-2 items-center hover:text-slate-300 long-transition"
 			on:click={() => open('https://github.com/MrValk/fabric-mod-hub')}
 		>
 			<Fa class="text-2xl" icon={faGithub} />

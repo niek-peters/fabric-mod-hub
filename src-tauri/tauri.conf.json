@@ -7,7 +7,7 @@
 		"distDir": "../build"
 	},
 	"package": {
-		"productName": "fabric-mod-hub",
+		"productName": "Fabric Mod Hub",
 		"version": "0.1.0"
 	},
 	"tauri": {
@@ -15,6 +15,14 @@
 			"all": false,
 			"shell": {
 				"open": true
+			},
+			"window": {
+				"all": false,
+				"close": true,
+				"hide": true,
+				"show": true,
+				"minimize": true,
+				"startDragging": true
 			}
 		},
 		"bundle": {
@@ -32,7 +40,7 @@
 				"icons/icon.icns",
 				"icons/icon.ico"
 			],
-			"identifier": "nl.egeldevs.fabric-mod-hub",
+			"identifier": "nl.niekpeters.fabric-mod-hub",
 			"longDescription": "",
 			"macOS": {
 				"entitlements": null,
@@ -62,8 +70,11 @@
 				"height": 700,
 				"resizable": false,
 				"title": "Fabric Mod Hub",
-				"width": 1000
+				"width": 1100,
+				"decorations": false,
+				"transparent": true
 			}
-		]
+		],
+		"macOSPrivateApi": true
 	}
 }

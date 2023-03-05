@@ -18,6 +18,9 @@ const config = {
 			$utils: 'src/lib/utils',
 			$stores: 'src/lib/stores',
 			$components: 'src/lib/components'
+		},
+		prerender: {
+			entries: ['*', '/packs/[id]']
 		}
 	}
 };

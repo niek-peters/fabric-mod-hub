@@ -12,7 +12,7 @@
 
 <a
 	{href}
-	class="flex items-center gap-4 py-2 px-4 rounded-md transition {$page.route.id === routeId
+	class="flex items-center gap-4 py-2 px-4 rounded-md long-transition {$page.route.id === routeId
 		? 'bg-zinc-700'
 		: 'bg-zinc-700/50 hover:bg-zinc-700/30'}"
 >
