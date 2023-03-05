@@ -1,9 +1,12 @@
 <script>
+	import { open } from '@tauri-apps/api/shell';
+
 	import Fa from 'svelte-fa';
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+	import { faGithub } from '@fortawesome/free-brands-svg-icons';
 </script>
 
-<div class="flex flex-col gap-8 mt-4">
+<div class="flex flex-col flex-grow gap-8 mt-4">
 	<section class="relative flex items-center justify-center">
 		<h1 class="absolute text-5xl text-center z-10">Welcome to Fabric Mod Hub</h1>
 		<img class="w-64 brightness-50" src="icon.svg" alt="Fabric Mod Hub icon" />
@@ -32,4 +35,14 @@
 			</section>
 		</div>
 	</article>
+	<section class="flex mt-auto justify-end">
+		<button
+			class="flex gap-2 items-center"
+			on:click={() => open('https://github.com/MrValk/fabric-mod-hub')}
+		>
+			<Fa class="text-2xl" icon={faGithub} />
+			<p>View the project on GitHub</p>
+			<Fa class="text-lg" icon={faUpRightFromSquare} />
+		</button>
+	</section>
 </div>
