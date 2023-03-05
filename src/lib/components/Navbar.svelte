@@ -66,7 +66,7 @@
 			<p>New modpack</p>
 		</a>
 	</section>
-	<section class="mt-auto flex">
+	<section class="mt-auto flex justify-center">
 		<p>&copy; Niek Peters 2023</p>
 	</section>
 </nav>
