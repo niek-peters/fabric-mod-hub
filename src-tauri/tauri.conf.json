@@ -60,7 +60,7 @@
 			{
 				"fullscreen": false,
 				"height": 700,
-				"resizable": true,
+				"resizable": false,
 				"title": "Fabric Mod Hub",
 				"width": 1000
 			}
