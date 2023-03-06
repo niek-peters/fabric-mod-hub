@@ -1,12 +1,13 @@
 pub mod models;
 
-use self::models::Modpack;
+use self::models::*;
 
 use include_sqlite_sql::{impl_sql, include_sql};
 use rusqlite::Connection;
 use std::{env, fs, path::PathBuf};
 
 include_sql!("sql/init.sql");
+include_sql!("sql/settings.sql");
 
 pub struct Database {
     pub connection: Connection,
@@ -24,29 +25,17 @@ impl Database {
             .as_str(),
         );
 
-        Self::create_tables(&connection);
+        Self::init_tables(&connection);
 
         Self { connection, path }
     }
 
-    fn create_tables(db: &Connection) {
-        db.create_table_modpacks(|_| Ok(()))
-            .expect("Could not create modpacks table");
+    fn init_tables(db: &Connection) {
+        db.create_tables()
+            .expect("Should create all tables that don't exist");
 
-        db.create_table_modpack_versions(|_| Ok(()))
-            .expect("Could not create modpack_versions table");
-
-        db.create_table_modpack_mods(|_| Ok(()))
-            .expect("Could not create modpack_mods table");
-
-        db.create_table_mods(|_| Ok(()))
-            .expect("Could not create mods table");
-
-        db.create_table_mod_versions(|_| Ok(()))
-            .expect("Could not create mod_versions table");
-
-        db.create_table_settings(|_| Ok(()))
-            .expect("Could not create settings table");
+        db.default_settings("blyat")
+            .expect("Should create settings table");
     }
 }
 
