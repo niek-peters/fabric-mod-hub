@@ -1,0 +1,11 @@
+{
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"driver": "SQLite",
+			"database": "${workspaceFolder:fabric-mod-hub}/src-tauri/dev.sqlite3",
+			"name": "Fabric Mod Hub Dev"
+		}
+	],
+	"sqltools.useNodeRuntime": true
+}

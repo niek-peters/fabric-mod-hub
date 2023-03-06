@@ -28,7 +28,7 @@
 			</section>
 		</div>
 		<Line />
-		<NavButton icon={faPlus} text="Add modpack" href="/add" />
+		<NavButton icon={faPlus} text="Install modpack" href="/install" />
 		<Line />
 		<NavButton icon={faGear} text="Settings" href="/settings" />
 	</section>
