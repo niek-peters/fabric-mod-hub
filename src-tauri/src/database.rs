@@ -34,8 +34,7 @@ impl Database {
         db.create_tables()
             .expect("Should create all tables that don't exist");
 
-        db.default_settings("blyat")
-            .expect("Should create settings table");
+        db.default_settings().expect("Should create settings table");
     }
 }
 
@@ -57,6 +56,7 @@ fn get_db_path(app_handle: &tauri::AppHandle) -> PathBuf {
             .as_str(),
         );
 
+        path.push(data_config_dir);
         path.push("db.sqlite3");
     }
 
