@@ -9,7 +9,7 @@ mod mods;
 mod settings;
 
 pub use mod_versions::ModVersion;
-pub use modpack_mods::ModpackMod;
+// pub use modpack_mods::ModpackMod;
 pub use modpack_versions::ModpackVersion;
 pub use modpacks::Modpack;
 pub use mods::Mod;

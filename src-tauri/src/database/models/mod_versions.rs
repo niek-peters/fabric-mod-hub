@@ -1,14 +1,16 @@
 use derive_new::new;
 use rusqlite::{params, Connection};
+use serde::Serialize;
 use std::error::Error;
 
 use super::DbModel;
 
-#[derive(new)]
+#[derive(new, Serialize)]
 pub struct ModVersion {
     #[new(default)]
     pub id: Option<i64>,
-    pub mod_id: i64,
+    #[new(default)]
+    pub mod_id: Option<i64>,
     pub version_id: String,
     pub game_version: String,
     pub download_url: String,
@@ -21,7 +23,7 @@ impl DbModel for ModVersion {
         db.execute(
             create_mod_version,
             params![
-                self.mod_id,
+                self.mod_id.ok_or("Foreign key mod_id is not set")?,
                 self.version_id,
                 self.game_version,
                 self.download_url

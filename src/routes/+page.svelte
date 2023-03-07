@@ -1,9 +1,15 @@
 <script>
 	import { open } from '@tauri-apps/api/shell';
+	import { invoke } from '@tauri-apps/api/tauri';
 
 	import Fa from 'svelte-fa';
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 	import { faGithub } from '@fortawesome/free-brands-svg-icons';
+
+	let debugMsg = '';
+	async function debug() {
+		debugMsg = JSON.stringify(await invoke('test_request'));
+	}
 </script>
 
 <div class="flex flex-col flex-grow w-full gap-8">
@@ -41,7 +47,8 @@
 			</section>
 		</div>
 	</article>
-	<section class="flex mt-auto justify-end h-fit">
+	<section class="flex mt-auto justify-between h-fit">
+		<button on:click={debug}>Debug msg: {debugMsg}</button>
 		<button
 			class="flex gap-2 items-center hover:text-slate-300 long-transition"
 			on:click={() => open('https://github.com/MrValk/fabric-mod-hub')}
