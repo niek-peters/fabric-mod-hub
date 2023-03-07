@@ -1,5 +1,5 @@
 use derive_new::new;
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use std::error::Error;
 
 use super::DbModel;
@@ -17,7 +17,7 @@ impl DbModel for Settings {
     fn save(&self, db: &Connection) -> Result<(), Box<dyn Error>> {
         let create_settings = include_str!("../../../sql/settings/create.sql");
 
-        db.execute(create_settings, params![self.minecraft_dir])?;
+        db.execute(create_settings, [&self.minecraft_dir])?;
 
         Ok(())
     }

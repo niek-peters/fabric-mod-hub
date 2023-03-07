@@ -2,7 +2,7 @@ pub mod models;
 
 // use self::models::*;
 
-use rusqlite::{params, Connection};
+use rusqlite::Connection;
 use std::{env, fs, path::PathBuf};
 
 pub struct Database {
@@ -22,7 +22,7 @@ impl Database {
         );
 
         let foreign_key_constraints = include_str!("../sql/foreign_key_constraints.sql");
-        db.execute(foreign_key_constraints, params!["ON"])
+        db.execute(foreign_key_constraints, [])
             .expect("Should enable foreign key constraints");
 
         let create_tables = include_str!("../sql/init.sql");
