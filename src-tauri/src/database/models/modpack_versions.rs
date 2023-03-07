@@ -1,13 +1,18 @@
+use derive_new::new;
 use rusqlite::{params, Connection};
 use std::error::Error;
 
 use super::DbModel;
 
+#[derive(new)]
 pub struct ModpackVersion {
+    #[new(default)]
     pub id: Option<i64>,
     pub modpack_id: i64,
     pub game_version: String,
+    #[new(default)]
     pub installed: bool,
+    #[new(default)]
     pub loaded: bool,
 }
 
@@ -21,17 +26,5 @@ impl DbModel for ModpackVersion {
         )?;
 
         Ok(())
-    }
-}
-
-impl ModpackVersion {
-    pub fn new(modpack_id: i64, game_version: String) -> Self {
-        ModpackVersion {
-            id: None,
-            modpack_id,
-            game_version,
-            installed: false,
-            loaded: false,
-        }
     }
 }

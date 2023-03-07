@@ -1,9 +1,12 @@
+use derive_new::new;
 use rusqlite::{params, Connection};
 use std::error::Error;
 
 use super::DbModel;
 
+#[derive(new)]
 pub struct ModpackMod {
+    #[new(default)]
     pub id: Option<i64>,
     pub modpack_id: i64,
     pub mod_id: i64,
@@ -16,15 +19,5 @@ impl DbModel for ModpackMod {
         db.execute(create_modpack_mod, params![self.modpack_id, self.mod_id])?;
 
         Ok(())
-    }
-}
-
-impl ModpackMod {
-    pub fn new(modpack_id: i64, mod_id: i64) -> Self {
-        ModpackMod {
-            id: None,
-            modpack_id,
-            mod_id,
-        }
     }
 }

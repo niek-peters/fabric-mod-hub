@@ -1,26 +1,17 @@
+use derive_new::new;
 use rusqlite::{params, Connection};
 use std::error::Error;
 
 use super::{modpack_mods::ModpackMod, DbModel};
 
+#[derive(new)]
 pub struct Modpack {
+    #[new(default)]
     pub id: Option<i64>,
     pub name: String,
     pub slug: String,
     pub premade: bool,
     pub mod_ids: Vec<i64>,
-}
-
-impl Modpack {
-    pub fn new(name: String, slug: String, premade: bool, mod_ids: Vec<i64>) -> Self {
-        Modpack {
-            id: None,
-            name,
-            slug,
-            premade,
-            mod_ids,
-        }
-    }
 }
 
 impl DbModel for Modpack {

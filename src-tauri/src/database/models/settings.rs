@@ -1,11 +1,15 @@
+use derive_new::new;
 use rusqlite::{params, Connection};
 use std::error::Error;
 
 use super::DbModel;
 
+#[derive(new)]
 pub struct Settings {
+    #[new(value = "1")]
     pub id: i64,
     pub minecraft_dir: String,
+    #[new(value = "true")]
     pub stable_only: bool,
 }
 
@@ -16,15 +20,5 @@ impl DbModel for Settings {
         db.execute(create_settings, params![self.minecraft_dir])?;
 
         Ok(())
-    }
-}
-
-impl Settings {
-    pub fn new(minecraft_dir: String, stable_only: bool) -> Self {
-        Settings {
-            id: 1,
-            minecraft_dir,
-            stable_only,
-        }
     }
 }

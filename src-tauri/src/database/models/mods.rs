@@ -1,9 +1,12 @@
+use derive_new::new;
 use rusqlite::{params, Connection};
 use std::error::Error;
 
 use super::DbModel;
 
+#[derive(new)]
 pub struct Mod {
+    #[new(default)]
     pub id: Option<i64>,
     pub project_id: String,
     pub name: String,
@@ -21,17 +24,5 @@ impl DbModel for Mod {
         )?;
 
         Ok(())
-    }
-}
-
-impl Mod {
-    pub fn new(project_id: String, name: String, slug: String, page_url: String) -> Self {
-        Mod {
-            id: None,
-            project_id,
-            name,
-            slug,
-            page_url,
-        }
     }
 }

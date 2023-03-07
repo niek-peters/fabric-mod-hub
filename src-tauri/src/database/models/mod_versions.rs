@@ -1,9 +1,12 @@
+use derive_new::new;
 use rusqlite::{params, Connection};
 use std::error::Error;
 
 use super::DbModel;
 
+#[derive(new)]
 pub struct ModVersion {
+    #[new(default)]
     pub id: Option<i64>,
     pub mod_id: i64,
     pub version_id: String,
@@ -26,22 +29,5 @@ impl DbModel for ModVersion {
         )?;
 
         Ok(())
-    }
-}
-
-impl ModVersion {
-    pub fn new(
-        mod_id: i64,
-        version_id: String,
-        game_version: String,
-        download_url: String,
-    ) -> Self {
-        ModVersion {
-            id: None,
-            mod_id,
-            version_id,
-            game_version,
-            download_url,
-        }
     }
 }
