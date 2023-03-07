@@ -1,14 +1,9 @@
 pub mod models;
 
-// use self::models::*;
-
 use rusqlite::Connection;
 use std::{env, fs, path::PathBuf};
 
-pub struct Database {
-    pub connection: Connection,
-    pub path: PathBuf,
-}
+pub struct Database(Connection);
 
 impl Database {
     pub fn init(app_handle: &tauri::AppHandle) -> Self {
@@ -29,10 +24,7 @@ impl Database {
         db.execute_batch(create_tables)
             .expect("Should create all tables that don't exist");
 
-        Self {
-            connection: db,
-            path,
-        }
+        Self(db)
     }
 }
 
