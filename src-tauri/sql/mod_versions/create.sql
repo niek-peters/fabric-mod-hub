@@ -1,0 +1,1 @@
+INSERT INTO mod_versions (mod_id, version_id, game_version, download_url) VALUES (?1, ?2, ?3, ?4);

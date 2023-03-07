@@ -10,14 +10,14 @@ use tauri::Manager;
 mod database;
 use database::Database;
 
-pub struct DBState(pub Mutex<Database>);
+pub struct DbState(pub Mutex<Database>);
 
 fn main() {
     dotenv().ok();
 
     tauri::Builder::default()
         .setup(|app| {
-            app.manage(DBState(Mutex::new(Database::init(&app.handle()))));
+            app.manage(DbState(Mutex::new(Database::init(&app.handle()))));
 
             Ok(())
         })

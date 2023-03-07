@@ -54,7 +54,6 @@ name = "app"
 version = "0.1.0"
 dependencies = [
  "dotenv",
- "include-sqlite-sql",
  "rusqlite",
  "serde",
  "serde_json",
@@ -1156,28 +1155,6 @@ dependencies = [
  "color_quant",
  "num-rational",
  "num-traits",
-]
-
-[[package]]
-name = "include-sql"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7cbb9ac0278db2be5d630974eb962cdba3393f1532a075f23cfb1ba91682427"
-dependencies = [
- "once_cell",
- "proc-macro2",
- "quote",
- "regex",
- "syn",
-]
-
-[[package]]
-name = "include-sqlite-sql"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "749064cc5ca28cccec658bcef9c27638a4e2fde519b589020c39863e3e2cb9d8"
-dependencies = [
- "include-sql",
 ]
 
 [[package]]

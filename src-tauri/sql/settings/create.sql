@@ -1,0 +1,1 @@
+INSERT OR IGNORE INTO settings (id, minecraft_dir) VALUES (0, ?1);

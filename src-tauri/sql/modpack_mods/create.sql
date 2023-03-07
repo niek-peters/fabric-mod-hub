@@ -1,0 +1,1 @@
+INSERT INTO modpack_mods (modpack_id, mod_id) VALUES (?1, ?2);

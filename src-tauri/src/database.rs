@@ -1,13 +1,9 @@
 pub mod models;
 
-use self::models::*;
+// use self::models::*;
 
-use include_sqlite_sql::{impl_sql, include_sql};
-use rusqlite::Connection;
+use rusqlite::{params, Connection};
 use std::{env, fs, path::PathBuf};
-
-include_sql!("sql/init.sql");
-include_sql!("sql/settings.sql");
 
 pub struct Database {
     pub connection: Connection,
@@ -17,7 +13,7 @@ pub struct Database {
 impl Database {
     pub fn init(app_handle: &tauri::AppHandle) -> Self {
         let path = get_db_path(app_handle);
-        let connection = Connection::open(&path).expect(
+        let db = Connection::open(&path).expect(
             format!(
                 "Should be able to open database with supplied path: {:?}",
                 &path
@@ -25,16 +21,18 @@ impl Database {
             .as_str(),
         );
 
-        Self::init_tables(&connection);
+        let foreign_key_constraints = include_str!("../sql/foreign_key_constraints.sql");
+        db.execute(foreign_key_constraints, params!["ON"])
+            .expect("Should enable foreign key constraints");
 
-        Self { connection, path }
-    }
-
-    fn init_tables(db: &Connection) {
-        db.create_tables()
+        let create_tables = include_str!("../sql/init.sql");
+        db.execute_batch(create_tables)
             .expect("Should create all tables that don't exist");
 
-        db.default_settings().expect("Should create settings table");
+        Self {
+            connection: db,
+            path,
+        }
     }
 }
 

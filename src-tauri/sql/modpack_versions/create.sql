@@ -1,0 +1,1 @@
+INSERT INTO modpack_versions (modpack_id, game_version) VALUES (?1, ?2);
