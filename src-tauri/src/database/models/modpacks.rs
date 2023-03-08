@@ -1,21 +1,25 @@
 use derive_new::new;
 use rusqlite::{params, Connection};
 use std::error::Error;
+use std::marker::PhantomData;
 
-use super::{modpack_mods::ModpackMod, DbModel, Mod};
+use super::{modpack_mods::ModpackMod, Mod};
+
+use super::{NotSaved, Saved};
 
 #[derive(new)]
-pub struct Modpack {
+pub struct Modpack<State = NotSaved> {
     #[new(default)]
     pub id: Option<i64>,
     pub name: String,
     pub slug: String,
     pub premade: bool,
-    pub mods: Vec<Mod>,
+    pub mods: Vec<Mod<Saved>>,
+    state: PhantomData<State>,
 }
 
-impl DbModel for Modpack {
-    fn save(&mut self, db: &Connection) -> Result<(), Box<dyn Error>> {
+impl Modpack<NotSaved> {
+    pub fn save(self, db: &Connection) -> Result<Modpack<Saved>, Box<dyn Error>> {
         let create_modpack = include_str!("../../../sql/modpacks/create.sql");
 
         let tx = db.unchecked_transaction()?;
@@ -27,10 +31,10 @@ impl DbModel for Modpack {
         // Prepare all modpack_mods
         let mut modpack_mods: Vec<ModpackMod> = Vec::new();
         for mod1 in &self.mods {
-            match mod1.id {
-                Some(mod_id) => modpack_mods.push(ModpackMod::new(id, mod_id)),
-                None => return Err("Mod is missing the database id".into()),
-            };
+            modpack_mods.push(ModpackMod::new(
+                id,
+                mod1.id.expect("Saved mod should have an id"),
+            ))
         }
 
         // Save them to the database
@@ -40,8 +44,13 @@ impl DbModel for Modpack {
 
         tx.commit()?;
 
-        self.id = Some(id);
-
-        Ok(())
+        Ok(Modpack {
+            id: Some(id),
+            name: self.name,
+            slug: self.slug,
+            premade: self.premade,
+            mods: self.mods,
+            state: PhantomData::<Saved>,
+        })
     }
 }

@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use std::error::Error;
+
 use dotenv::dotenv;
 use r2d2::PooledConnection;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -11,12 +13,11 @@ use tauri::Manager;
 
 mod database;
 use database::{
-    models::{DbModel, Mod, Modpack, ModpackVersion},
+    models::{Mod, Modpack, ModpackVersion, Saved, Settings},
     Database,
 };
 
 mod requests;
-
 pub struct DbState(Database);
 pub struct ReqState(Client);
 
@@ -27,6 +28,12 @@ fn main() {
         .setup(|app| {
             app.manage(DbState(Database::init(&app.handle())));
             app.manage(ReqState(Client::new()));
+
+            // Initialize settings
+            let db = database::get_conn(app.state::<DbState>());
+            Settings::new("lol".to_string())
+                .save(&db)
+                .expect("Should initialize settings");
 
             Ok(())
         })
@@ -39,30 +46,30 @@ fn main() {
 async fn test_request(
     client: tauri::State<'_, ReqState>,
     db: tauri::State<'_, DbState>,
-) -> Result<ModpackVersion, String> {
+) -> Result<ModpackVersion<Saved>, String> {
     let client = &client.0;
-    let conn = get_conn(&db);
+    let db = database::get_conn(db);
 
-    let mut mod1 = Mod::from_project_id(client, "ssUbhMkL".to_string())
-        .await
-        .map_err(|e| e.to_string())?;
-    mod1.save(&conn).map_err(|e| e.to_string())?;
-
-    let mut modpack = Modpack::new("Test".to_string(), "test".to_string(), true, vec![mod1]);
-    modpack.save(&conn).map_err(|e| e.to_string())?;
-
-    let mut modpack_version = modpack
-        .get_version(client, get_conn(&db), "1.19.2")
-        .await
-        .map_err(|e| e.to_string())?;
-    modpack_version.save(&conn).map_err(|e| e.to_string())?;
-
-    Ok(modpack_version)
+    test(client, db).await.map_err(|e| e.to_string())
 }
 
-fn get_conn(db: &tauri::State<'_, DbState>) -> PooledConnection<SqliteConnectionManager> {
-    db.0 .0
-        .clone()
-        .get()
-        .expect(format!("Should be able to get connection pool").as_str())
+async fn test(
+    client: &Client,
+    db: PooledConnection<SqliteConnectionManager>,
+) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
+    let mod1 = Mod::from_project_id(client, "ssUbhMkL".to_string())
+        .await?
+        .save(&db)?;
+
+    let modpack =
+        Modpack::new("Test".to_string(), "test".to_string(), true, vec![mod1]).save(&db)?;
+
+    // Get all ModVersions from modpack's list of mods
+    for mod1 in &modpack.mods {
+        mod1.get_version(client, "1.19.2").await?.save(&db)?;
+    }
+
+    let modpack_version = modpack.get_version("1.19.2").save(&db)?;
+
+    Ok(modpack_version)
 }

@@ -3,7 +3,7 @@ use std::error::Error;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
-use crate::database::models::{Mod, ModVersion};
+use crate::database::models::{Mod, ModVersion, Saved};
 
 #[derive(Serialize, Deserialize)]
 struct VersionResponse {
@@ -26,16 +26,13 @@ struct Dependency {
     version_id: String,
 }
 
-impl Mod {
+impl Mod<Saved> {
     pub async fn get_version(
         &self,
         client: &Client,
         game_version: &str,
     ) -> Result<ModVersion, Box<dyn Error>> {
-        let id = match self.id {
-            Some(id) => id,
-            None => return Err("Mod does not have an id".into()),
-        };
+        let id = self.id.expect("Saved mod should have an id");
 
         let res = client
             .get(format!(

@@ -1,21 +1,22 @@
 use derive_new::new;
 use rusqlite::{params, Connection};
-use std::error::Error;
+use std::{error::Error, marker::PhantomData};
 
-use super::DbModel;
+use super::{NotSaved, Saved};
 
 #[derive(new)]
-pub struct Mod {
+pub struct Mod<State = NotSaved> {
     #[new(default)]
     pub id: Option<i64>,
     pub project_id: String,
     pub name: String,
     pub slug: String,
     pub page_url: String,
+    state: PhantomData<State>,
 }
 
-impl DbModel for Mod {
-    fn save(&mut self, db: &Connection) -> Result<(), Box<dyn Error>> {
+impl Mod<NotSaved> {
+    pub fn save(self, db: &Connection) -> Result<Mod<Saved>, Box<dyn Error>> {
         let create_mod = include_str!("../../../sql/mods/create.sql");
 
         let tx = db.unchecked_transaction()?;
@@ -29,8 +30,13 @@ impl DbModel for Mod {
 
         tx.commit()?;
 
-        self.id = Some(id);
-
-        Ok(())
+        Ok(Mod {
+            id: Some(id),
+            project_id: self.project_id,
+            name: self.name,
+            slug: self.slug,
+            page_url: self.page_url,
+            state: PhantomData::<Saved>,
+        })
     }
 }

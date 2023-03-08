@@ -1,8 +1,10 @@
 pub mod models;
 
-use r2d2::Pool;
+use r2d2::{Pool, PooledConnection};
 use r2d2_sqlite::SqliteConnectionManager;
 use std::{env, fs, path::PathBuf, sync::Arc};
+
+use crate::DbState;
 
 pub struct Database(pub Arc<Pool<SqliteConnectionManager>>);
 
@@ -60,6 +62,15 @@ fn get_db_path(app_handle: &tauri::AppHandle) -> PathBuf {
     }
 
     path
+}
+
+pub fn get_conn(db_state: tauri::State<'_, DbState>) -> PooledConnection<SqliteConnectionManager> {
+    db_state
+        .0
+         .0
+        .clone()
+        .get()
+        .expect(format!("Should be able to get connection pool").as_str())
 }
 
 fn is_dev() -> bool {

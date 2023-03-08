@@ -1,12 +1,12 @@
 use derive_new::new;
 use rusqlite::{params, Connection};
 use serde::Serialize;
-use std::error::Error;
+use std::{error::Error, marker::PhantomData};
 
-use super::DbModel;
+use super::{NotSaved, Saved};
 
 #[derive(new, Serialize)]
-pub struct ModpackVersion {
+pub struct ModpackVersion<State = NotSaved> {
     #[new(default)]
     pub id: Option<i64>,
     pub modpack_id: i64,
@@ -15,10 +15,11 @@ pub struct ModpackVersion {
     pub installed: bool,
     #[new(default)]
     pub loaded: bool,
+    state: PhantomData<State>,
 }
 
-impl DbModel for ModpackVersion {
-    fn save(&mut self, db: &Connection) -> Result<(), Box<dyn Error>> {
+impl ModpackVersion {
+    pub fn save(self, db: &Connection) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
         let create_modpack_version = include_str!("../../../sql/modpack_versions/create.sql");
 
         let tx = db.unchecked_transaction()?;
@@ -32,8 +33,13 @@ impl DbModel for ModpackVersion {
 
         tx.commit()?;
 
-        self.id = Some(id);
-
-        Ok(())
+        Ok(ModpackVersion {
+            id: Some(id),
+            modpack_id: self.modpack_id,
+            game_version: self.game_version,
+            installed: self.installed,
+            loaded: self.loaded,
+            state: PhantomData::<Saved>,
+        })
     }
 }

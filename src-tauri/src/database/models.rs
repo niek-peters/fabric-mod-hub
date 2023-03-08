@@ -1,6 +1,3 @@
-use rusqlite::Connection;
-use std::error::Error;
-
 mod mod_versions;
 mod modpack_mods;
 mod modpack_versions;
@@ -18,7 +15,8 @@ pub use settings::Settings;
 // Organized view of the database structure
 // https://drawsql.app/teams/egel-developers/diagrams/main-2
 
-pub trait DbModel {
-    fn save(&mut self, db: &Connection) -> Result<(), Box<dyn Error>>;
-    // fn set_id(&mut self, id: i64);
-}
+#[derive(Clone)]
+pub struct Saved;
+
+#[derive(Clone)]
+pub struct NotSaved;
