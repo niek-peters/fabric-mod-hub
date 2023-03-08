@@ -18,10 +18,10 @@ pub struct ModVersion<State = NotSaved> {
 }
 
 impl ModVersion {
-    pub fn save(self, db: &Connection) -> Result<ModVersion<Saved>, Box<dyn Error>> {
+    pub fn save(self, db: &mut Connection) -> Result<ModVersion<Saved>, Box<dyn Error>> {
         let create_mod_version = include_str!("../../../sql/mod_versions/create.sql");
 
-        let tx = db.unchecked_transaction()?;
+        let tx = db.transaction()?;
 
         tx.execute(
             create_mod_version,

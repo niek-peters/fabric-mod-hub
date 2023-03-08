@@ -19,10 +19,10 @@ pub struct ModpackVersion<State = NotSaved> {
 }
 
 impl ModpackVersion {
-    pub fn save(self, db: &Connection) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
+    pub fn save(self, db: &mut Connection) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
         let create_modpack_version = include_str!("../../../sql/modpack_versions/create.sql");
 
-        let tx = db.unchecked_transaction()?;
+        let tx = db.transaction()?;
 
         tx.execute(
             create_modpack_version,

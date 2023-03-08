@@ -19,10 +19,10 @@ pub struct Modpack<State = NotSaved> {
 }
 
 impl Modpack<NotSaved> {
-    pub fn save(self, db: &Connection) -> Result<Modpack<Saved>, Box<dyn Error>> {
+    pub fn save(self, db: &mut Connection) -> Result<Modpack<Saved>, Box<dyn Error>> {
         let create_modpack = include_str!("../../../sql/modpacks/create.sql");
 
-        let tx = db.unchecked_transaction()?;
+        let tx = db.transaction()?;
 
         tx.execute(create_modpack, params![self.name, self.slug, self.premade])?;
 
@@ -39,7 +39,7 @@ impl Modpack<NotSaved> {
 
         // Save them to the database
         for modpack_mod in modpack_mods {
-            modpack_mod.clone().save(db)?;
+            modpack_mod.clone().save(&tx)?;
         }
 
         tx.commit()?;

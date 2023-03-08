@@ -48,28 +48,28 @@ async fn test_request(
     db: tauri::State<'_, DbState>,
 ) -> Result<ModpackVersion<Saved>, String> {
     let client = &client.0;
-    let db = database::get_conn(db);
+    let mut db = database::get_conn(db);
 
-    test(client, db).await.map_err(|e| e.to_string())
+    test(client, &mut db).await.map_err(|e| e.to_string())
 }
 
 async fn test(
     client: &Client,
-    db: PooledConnection<SqliteConnectionManager>,
+    db: &mut PooledConnection<SqliteConnectionManager>,
 ) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
     let mod1 = Mod::from_project_id(client, "ssUbhMkL".to_string())
         .await?
-        .save(&db)?;
+        .save(db)?;
 
     let modpack =
-        Modpack::new("Test".to_string(), "test".to_string(), true, vec![mod1]).save(&db)?;
+        Modpack::new("Test".to_string(), "test".to_string(), true, vec![mod1]).save(db)?;
 
     // Get all ModVersions from modpack's list of mods
     for mod1 in &modpack.mods {
-        mod1.get_version(client, "1.19.2").await?.save(&db)?;
+        mod1.get_version(client, "1.19.2").await?.save(db)?;
     }
 
-    let modpack_version = modpack.get_version("1.19.2").save(&db)?;
+    let modpack_version = modpack.get_version("1.19.2").save(db)?;
 
     Ok(modpack_version)
 }
