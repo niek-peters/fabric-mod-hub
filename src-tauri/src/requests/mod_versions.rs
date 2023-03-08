@@ -13,11 +13,17 @@ struct VersionResponse {
     status: String,
     loaders: Vec<String>,
     files: Vec<File>,
+    dependencies: Vec<Dependency>,
 }
 
 #[derive(Serialize, Deserialize)]
 struct File {
     url: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Dependency {
+    version_id: String,
 }
 
 impl Mod {
@@ -26,6 +32,11 @@ impl Mod {
         client: &Client,
         game_version: &str,
     ) -> Result<ModVersion, Box<dyn Error>> {
+        let id = match self.id {
+            Some(id) => id,
+            None => return Err("Mod does not have an id".into()),
+        };
+
         let res = client
             .get(format!(
                 "https://api.modrinth.com/v2/project/{}/version",
@@ -44,14 +55,21 @@ impl Mod {
                 && version.loaders.contains(&"fabric".to_string())
             {
                 latest_version = Some(version);
+                break;
             }
         }
 
         match latest_version {
             Some(version) => Ok(ModVersion::new(
+                id,
                 version.id,
-                String::from(game_version),
+                game_version.to_string(),
                 version.files[0].url.to_string(),
+                version
+                    .dependencies
+                    .iter()
+                    .map(|d| d.version_id.to_string())
+                    .collect(),
             )),
             None => Err("This mod version is not available".into()),
         }

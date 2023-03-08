@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { open } from '@tauri-apps/api/shell';
 	import { invoke } from '@tauri-apps/api/tauri';
 
@@ -6,9 +6,13 @@
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 	import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
-	let debugMsg = '';
+	let debugMsg: any;
 	async function debug() {
-		debugMsg = JSON.stringify(await invoke('test_request'));
+		try {
+			debugMsg = JSON.stringify(await invoke('test_request'));
+		} catch (e) {
+			debugMsg = e;
+		}
 	}
 </script>
 

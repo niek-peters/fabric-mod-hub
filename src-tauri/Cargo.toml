@@ -23,6 +23,8 @@ dotenv = "0.15.0"
 derive-new = "0.5.9"
 reqwest = { version = "0.11.14", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
+r2d2_sqlite = "0.21.0"
+r2d2 = "0.8.10"
 
 [features]
 # by default Tauri runs in production mode

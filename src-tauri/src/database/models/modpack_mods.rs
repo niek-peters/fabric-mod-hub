@@ -4,7 +4,7 @@ use std::error::Error;
 
 use super::DbModel;
 
-#[derive(new)]
+#[derive(new, Clone)]
 pub struct ModpackMod {
     #[new(default)]
     pub id: Option<i64>,
@@ -13,10 +13,12 @@ pub struct ModpackMod {
 }
 
 impl DbModel for ModpackMod {
-    fn save(&self, db: &Connection) -> Result<(), Box<dyn Error>> {
+    fn save(&mut self, db: &Connection) -> Result<(), Box<dyn Error>> {
         let create_modpack_mod = include_str!("../../../sql/modpack_mods/create.sql");
 
         db.execute(create_modpack_mod, params![self.modpack_id, self.mod_id])?;
+
+        self.id = Some(self.modpack_id);
 
         Ok(())
     }

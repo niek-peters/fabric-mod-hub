@@ -19,5 +19,6 @@ pub use settings::Settings;
 // https://drawsql.app/teams/egel-developers/diagrams/main-2
 
 pub trait DbModel {
-    fn save(&self, db: &Connection) -> Result<(), Box<dyn Error>>;
+    fn save(&mut self, db: &Connection) -> Result<(), Box<dyn Error>>;
+    // fn set_id(&mut self, id: i64);
 }

@@ -15,13 +15,21 @@ pub struct Mod {
 }
 
 impl DbModel for Mod {
-    fn save(&self, db: &Connection) -> Result<(), Box<dyn Error>> {
+    fn save(&mut self, db: &Connection) -> Result<(), Box<dyn Error>> {
         let create_mod = include_str!("../../../sql/mods/create.sql");
 
-        db.execute(
+        let tx = db.unchecked_transaction()?;
+
+        tx.execute(
             create_mod,
             params![self.project_id, self.name, self.slug, self.page_url],
         )?;
+
+        let id = tx.last_insert_rowid();
+
+        tx.commit()?;
+
+        self.id = Some(id);
 
         Ok(())
     }

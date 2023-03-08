@@ -3,21 +3,21 @@
     windows_subsystem = "windows"
 )]
 
-use std::sync::Mutex;
-
 use dotenv::dotenv;
+use r2d2::PooledConnection;
+use r2d2_sqlite::SqliteConnectionManager;
 use reqwest::Client;
 use tauri::Manager;
 
 mod database;
 use database::{
-    models::{Mod, ModVersion},
+    models::{DbModel, Mod, Modpack, ModpackVersion},
     Database,
 };
 
 mod requests;
 
-pub struct DbState(Mutex<Database>);
+pub struct DbState(Database);
 pub struct ReqState(Client);
 
 fn main() {
@@ -25,7 +25,7 @@ fn main() {
 
     tauri::Builder::default()
         .setup(|app| {
-            app.manage(DbState(Mutex::new(Database::init(&app.handle()))));
+            app.manage(DbState(Database::init(&app.handle())));
             app.manage(ReqState(Client::new()));
 
             Ok(())
@@ -36,14 +36,33 @@ fn main() {
 }
 
 #[tauri::command]
-async fn test_request(client: tauri::State<'_, ReqState>) -> Result<ModVersion, ()> {
-    Ok(Mod::new(
-        "P7dR8mSH".to_string(),
-        "Gravestones".to_string(),
-        "gravestones".to_string(),
-        "blyat lol".to_string(),
-    )
-    .get_version(&client.inner().0, "1.19.2")
-    .await
-    .expect("Could not get version"))
+async fn test_request(
+    client: tauri::State<'_, ReqState>,
+    db: tauri::State<'_, DbState>,
+) -> Result<ModpackVersion, String> {
+    let client = &client.0;
+    let conn = get_conn(&db);
+
+    let mut mod1 = Mod::from_project_id(client, "ssUbhMkL".to_string())
+        .await
+        .map_err(|e| e.to_string())?;
+    mod1.save(&conn).map_err(|e| e.to_string())?;
+
+    let mut modpack = Modpack::new("Test".to_string(), "test".to_string(), true, vec![mod1]);
+    modpack.save(&conn).map_err(|e| e.to_string())?;
+
+    let mut modpack_version = modpack
+        .get_version(client, get_conn(&db), "1.19.2")
+        .await
+        .map_err(|e| e.to_string())?;
+    modpack_version.save(&conn).map_err(|e| e.to_string())?;
+
+    Ok(modpack_version)
+}
+
+fn get_conn(db: &tauri::State<'_, DbState>) -> PooledConnection<SqliteConnectionManager> {
+    db.0 .0
+        .clone()
+        .get()
+        .expect(format!("Should be able to get connection pool").as_str())
 }

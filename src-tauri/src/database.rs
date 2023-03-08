@@ -1,20 +1,29 @@
 pub mod models;
 
-use rusqlite::Connection;
-use std::{env, fs, path::PathBuf};
+use r2d2::Pool;
+use r2d2_sqlite::SqliteConnectionManager;
+use std::{env, fs, path::PathBuf, sync::Arc};
 
-pub struct Database(Connection);
+pub struct Database(pub Arc<Pool<SqliteConnectionManager>>);
 
 impl Database {
     pub fn init(app_handle: &tauri::AppHandle) -> Self {
         let path = get_db_path(app_handle);
-        let db = Connection::open(&path).expect(
+
+        let man = SqliteConnectionManager::file(path.clone());
+        let pool = r2d2::Pool::new(man).expect(
             format!(
-                "Should be able to open database with supplied path: {:?}",
+                "Should be able to open connection pool for database with supplied path: {:?}",
                 &path
             )
             .as_str(),
         );
+        let pool_arc = Arc::new(pool);
+
+        let db = pool_arc
+            .clone()
+            .get()
+            .expect(format!("Should be able to get connection pool").as_str());
 
         let foreign_key_constraints = include_str!("../sql/foreign_key_constraints.sql");
         db.execute(foreign_key_constraints, [])
@@ -24,7 +33,7 @@ impl Database {
         db.execute_batch(create_tables)
             .expect("Should create all tables that don't exist");
 
-        Self(db)
+        Self(pool_arc)
     }
 }
 
