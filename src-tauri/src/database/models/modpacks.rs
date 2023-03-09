@@ -1,4 +1,5 @@
 use derive_new::new;
+use reqwest::Client;
 use rusqlite::{params, Connection};
 use std::error::Error;
 use std::marker::PhantomData;
@@ -52,5 +53,21 @@ impl Modpack<NotSaved> {
             mods: self.mods,
             state: PhantomData::<Saved>,
         })
+    }
+
+    pub async fn create(
+        client: &Client,
+        db: &mut Connection,
+        name: String,
+        slug: String,
+        premade: bool,
+        project_ids: Vec<String>,
+    ) -> Result<Modpack<Saved>, Box<dyn Error>> {
+        let mut mods: Vec<Mod<Saved>> = Vec::new();
+        for project_id in project_ids {
+            mods.push(Mod::from_project_id(client, project_id).await?.save(db)?);
+        }
+
+        Modpack::new(name, slug, premade, mods).save(db)
     }
 }

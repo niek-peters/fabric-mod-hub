@@ -57,12 +57,15 @@ async fn test(
     client: &Client,
     db: &mut PooledConnection<SqliteConnectionManager>,
 ) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
-    let mod1 = Mod::from_project_id(client, "ssUbhMkL".to_string())
-        .await?
-        .save(db)?;
-
-    let modpack =
-        Modpack::new("Test".to_string(), "test".to_string(), true, vec![mod1]).save(db)?;
+    let modpack = Modpack::create(
+        client,
+        db,
+        "Test2".to_string(),
+        "test2".to_string(),
+        true,
+        vec!["ssUbhMkL".to_string()],
+    )
+    .await?;
 
     // Get all ModVersions from modpack's list of mods
     for mod1 in &modpack.mods {
