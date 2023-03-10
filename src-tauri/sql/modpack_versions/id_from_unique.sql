@@ -1,0 +1,1 @@
+SELECT id FROM modpack_versions WHERE modpack_id = $1 AND game_version = ?2;

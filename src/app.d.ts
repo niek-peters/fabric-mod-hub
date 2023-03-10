@@ -1,6 +1,32 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {
+	type Mod = {
+		id: number | null;
+		project_id: string;
+		name: string;
+		slug: string;
+		page_url: string;
+	};
+
+	type Modpack = {
+		id: number | null;
+		name: string;
+		slug: string;
+		premade: boolean;
+	};
+
+	type ModpackJoin = {
+		id: number | null;
+		modpack_id: number;
+		name: string;
+		slug: string;
+		game_version: string;
+		premade: boolean;
+		installed: boolean;
+		loaded: boolean;
+	};
+
 	namespace App {
 		// interface Error {}
 		// interface Locals {}

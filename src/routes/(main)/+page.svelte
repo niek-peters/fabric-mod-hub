@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { open } from '@tauri-apps/api/shell';
 	import { invoke } from '@tauri-apps/api/tauri';
 
 	import Fa from 'svelte-fa';
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 	import { faGithub } from '@fortawesome/free-brands-svg-icons';
+
+	import { modpacks } from '$src/hooks.client';
 
 	let debugMsg: any;
 	async function debug() {
@@ -14,6 +17,10 @@
 			debugMsg = e;
 		}
 	}
+
+	onMount(() => {
+		console.log(modpacks);
+	});
 </script>
 
 <div class="flex flex-col flex-grow w-full gap-8">

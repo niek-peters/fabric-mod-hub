@@ -23,7 +23,8 @@ struct File {
 
 #[derive(Serialize, Deserialize)]
 struct Dependency {
-    version_id: String,
+    version_id: Option<String>,
+    dependency_type: String,
 }
 
 impl Mod<Saved> {
@@ -40,12 +41,20 @@ impl Mod<Saved> {
                 self.project_id
             ))
             .send()
-            .await?
-            .json::<Vec<VersionResponse>>()
             .await?;
 
+        if !res.status().is_success() {
+            return Err(format!(
+                "Mod.get_version: Modrinth API returned non-success status: {}",
+                res.status()
+            )
+            .into());
+        }
+
+        let version_res = res.json::<Vec<VersionResponse>>().await?;
+
         let mut latest_version: Option<VersionResponse> = None;
-        for version in res {
+        for version in version_res {
             if version.game_versions.contains(&game_version.to_string())
                 && version.version_type == "release"
                 && version.status == "listed"
@@ -65,7 +74,13 @@ impl Mod<Saved> {
                 version
                     .dependencies
                     .iter()
-                    .map(|d| d.version_id.to_string())
+                    .filter(|d| d.dependency_type != "optional" && d.version_id.is_some())
+                    .map(|d| {
+                        d.version_id
+                            .as_ref()
+                            .expect("version_id should be Some")
+                            .to_string()
+                    })
                     .collect(),
             )),
             None => Err("This mod version is not available".into()),

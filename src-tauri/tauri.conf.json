@@ -66,11 +66,22 @@
 		},
 		"windows": [
 			{
+				"label": "main",
+				"title": "Fabric Mod Hub",
 				"fullscreen": false,
+				"width": 1100,
 				"height": 700,
 				"resizable": false,
-				"title": "Fabric Mod Hub",
+				"decorations": false,
+				"transparent": true
+			},
+			{
+				"label": "splashscreen",
+				"url": "splashscreen",
+				"fullscreen": false,
 				"width": 1100,
+				"height": 700,
+				"resizable": false,
 				"decorations": false,
 				"transparent": true
 			}

@@ -18,14 +18,22 @@ impl Mod {
         let res = client
             .get(format!("https://api.modrinth.com/v2/project/{}", mod_id))
             .send()
-            .await?
-            .json::<ModResponse>()
             .await?;
+
+        if !res.status().is_success() {
+            return Err(format!(
+                "Mod::from_project_id: Modrinth API returned non-success status: {}",
+                res.status()
+            )
+            .into());
+        }
+
+        let mod_res = res.json::<ModResponse>().await?;
 
         let page_url = format!("https://modrinth.com/mod/{}", mod_id);
 
-        if res.project_type == "mod" && res.status == "approved" {
-            Ok(Mod::new(mod_id, res.title, res.slug, page_url))
+        if mod_res.project_type == "mod" && mod_res.status == "approved" {
+            Ok(Mod::new(mod_id, mod_res.title, mod_res.slug, page_url))
         } else {
             Err("Mod_id does not point to listed mod".into())
         }

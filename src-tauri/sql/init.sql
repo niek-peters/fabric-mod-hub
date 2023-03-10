@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS modpack_versions (
     game_version VARCHAR(63) NOT NULL,
     installed BOOLEAN NOT NULL DEFAULT FALSE,
     loaded BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (modpack_id) REFERENCES modpacks(id) ON DELETE CASCADE
+    FOREIGN KEY (modpack_id) REFERENCES modpacks(id) ON DELETE CASCADE,
+    CONSTRAINT modpack_version_unique UNIQUE (modpack_id, game_version)
 );
 
 CREATE TABLE IF NOT EXISTS modpack_mods (

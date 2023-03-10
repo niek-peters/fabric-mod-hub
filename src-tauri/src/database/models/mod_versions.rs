@@ -3,6 +3,8 @@ use rusqlite::{params, Connection};
 use serde::Serialize;
 use std::{error::Error, marker::PhantomData};
 
+use crate::database::errors;
+
 use super::{NotSaved, Saved};
 
 #[derive(new, Serialize)]
@@ -17,23 +19,32 @@ pub struct ModVersion<State = NotSaved> {
     state: PhantomData<State>,
 }
 
-impl ModVersion {
+impl ModVersion<NotSaved> {
     pub fn save(self, db: &mut Connection) -> Result<ModVersion<Saved>, Box<dyn Error>> {
-        let create_mod_version = include_str!("../../../sql/mod_versions/create.sql");
-
         let tx = db.transaction()?;
 
-        tx.execute(
-            create_mod_version,
+        let id = match tx.execute(
+            include_str!("../../../sql/mod_versions/create.sql"),
             params![
                 self.mod_id,
                 self.version_id,
                 self.game_version,
                 self.download_url
             ],
-        )?;
+        ) {
+            Ok(_) => tx.last_insert_rowid(),
+            Err(err) => {
+                if !errors::is_constraint_err(&err) {
+                    return Err(err.into());
+                }
 
-        let id = tx.last_insert_rowid();
+                tx.query_row(
+                    include_str!("../../../sql/mod_versions/id_from_version_id.sql"),
+                    params![self.version_id],
+                    |row| row.get(0),
+                )?
+            }
+        };
 
         tx.commit()?;
 

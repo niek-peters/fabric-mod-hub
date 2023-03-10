@@ -4,7 +4,7 @@
 	import Titlebar from '$components/Titlebar.svelte';
 	import Transition from '$components/Transition.svelte';
 	import Navbar from '$components/navbar/Navbar.svelte';
-	import type { LayoutData } from './$types';
+	import type { LayoutData } from '../$types';
 
 	export let data: LayoutData;
 </script>

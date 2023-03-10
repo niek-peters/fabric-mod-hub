@@ -3,6 +3,8 @@ use rusqlite::{params, Connection};
 use serde::Serialize;
 use std::{error::Error, marker::PhantomData};
 
+use crate::database::errors;
+
 use super::{NotSaved, Saved};
 
 #[derive(new, Serialize)]
@@ -18,18 +20,29 @@ pub struct ModpackVersion<State = NotSaved> {
     state: PhantomData<State>,
 }
 
-impl ModpackVersion {
+impl ModpackVersion<NotSaved> {
     pub fn save(self, db: &mut Connection) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
         let create_modpack_version = include_str!("../../../sql/modpack_versions/create.sql");
 
         let tx = db.transaction()?;
 
-        tx.execute(
+        let id = match tx.execute(
             create_modpack_version,
             params![self.modpack_id, self.game_version],
-        )?;
+        ) {
+            Ok(_) => tx.last_insert_rowid(),
+            Err(err) => {
+                if !errors::is_constraint_err(&err) {
+                    return Err(err.into());
+                }
 
-        let id = tx.last_insert_rowid();
+                tx.query_row(
+                    include_str!("../../../sql/modpack_versions/id_from_unique.sql"),
+                    params![self.modpack_id, self.game_version],
+                    |row| row.get(0),
+                )?
+            }
+        };
 
         tx.commit()?;
 

@@ -13,7 +13,7 @@ pub struct ModpackMod<State = NotSaved> {
     state: PhantomData<State>,
 }
 
-impl ModpackMod {
+impl ModpackMod<NotSaved> {
     pub fn save(self, db: &Connection) -> Result<ModpackMod<Saved>, Box<dyn Error>> {
         let create_modpack_mod = include_str!("../../../sql/modpack_mods/create.sql");
 

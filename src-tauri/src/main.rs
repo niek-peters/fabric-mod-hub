@@ -13,7 +13,7 @@ use tauri::Manager;
 
 mod database;
 use database::{
-    models::{Mod, Modpack, ModpackVersion, Saved, Settings},
+    models::{Modpack, ModpackJoin, ModpackVersion, Saved, Settings},
     Database,
 };
 
@@ -30,16 +30,49 @@ fn main() {
             app.manage(ReqState(Client::new()));
 
             // Initialize settings
-            let db = database::get_conn(app.state::<DbState>());
+            let client = &app.state::<ReqState>().0;
+            let mut db = database::get_conn(app.state::<DbState>());
+
             Settings::new("lol".to_string())
                 .save(&db)
                 .expect("Should initialize settings");
 
+            let splashscreen_window = app.get_window("splashscreen").unwrap();
+            let main_window = app.get_window("main").unwrap();
+
+            let client_clone = client.clone();
+
+            // we perform the initialization code on a new task so the app doesn't freeze
+            tauri::async_runtime::spawn(async move {
+                // Initialize default modpacks
+                create_default_modpack_versions(&client_clone, &mut db).await;
+
+                // After it's done, close the splashscreen and display the main window
+                splashscreen_window.close().unwrap();
+                main_window.show().unwrap();
+            });
+
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![test_request])
+        .invoke_handler(tauri::generate_handler![
+            test_request,
+            get_all_modpacks,
+            get_all_modpack_versions
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn get_all_modpacks(db: tauri::State<'_, DbState>) -> Vec<Modpack<Saved>> {
+    let db = database::get_conn(db);
+    Modpack::get_all(&db)
+}
+
+#[tauri::command]
+fn get_all_modpack_versions(db: tauri::State<'_, DbState>) -> Vec<ModpackJoin> {
+    let db = database::get_conn(db);
+    ModpackJoin::get_all(&db)
 }
 
 #[tauri::command]
@@ -67,12 +100,40 @@ async fn test(
     )
     .await?;
 
-    // Get all ModVersions from modpack's list of mods
-    for mod1 in &modpack.mods {
-        mod1.get_version(client, "1.19.2").await?.save(db)?;
-    }
+    modpack.create_version(client, db, "1.19.2").await
+}
 
-    let modpack_version = modpack.get_version("1.19.2").save(db)?;
+async fn create_default_modpack_versions(
+    client: &Client,
+    db: &mut PooledConnection<SqliteConnectionManager>,
+) {
+    let modpack1 = Modpack::create(
+        client,
+        db,
+        "Optimizations".to_string(),
+        "optimizations".to_string(),
+        true,
+        vec![
+            "gvQqBUqZ".to_string(),
+            "AANobbMI".to_string(),
+            "H8CaAYZC".to_string(),
+        ],
+    )
+    .await
+    .unwrap();
 
-    Ok(modpack_version)
+    modpack1.create_version(client, db, "1.19.2").await.unwrap();
+
+    let modpack2 = Modpack::create(
+        client,
+        db,
+        "Multiplayer".to_string(),
+        "multiplayer".to_string(),
+        true,
+        vec!["9eGKb6K1".to_string()],
+    )
+    .await
+    .unwrap();
+
+    modpack2.create_version(client, db, "1.19.2").await.unwrap();
 }
