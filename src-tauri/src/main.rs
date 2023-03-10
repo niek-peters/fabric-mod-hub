@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::error::Error;
+use std::{error::Error, fmt::format};
 
 use dotenv::dotenv;
 use r2d2::PooledConnection;
@@ -13,7 +13,7 @@ use tauri::Manager;
 
 mod database;
 use database::{
-    joins::ModpackJoin,
+    joins::{ModJoin, ModpackJoin},
     models::{Modpack, ModpackVersion, Saved, Settings},
     Database,
 };
@@ -58,7 +58,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             test_request,
             get_all_modpacks,
-            get_all_modpack_versions
+            get_all_modpack_joins,
+            get_mod_joins_from_modpack_id
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -71,9 +72,16 @@ fn get_all_modpacks(db: tauri::State<'_, DbState>) -> Vec<Modpack<Saved>> {
 }
 
 #[tauri::command]
-fn get_all_modpack_versions(db: tauri::State<'_, DbState>) -> Vec<ModpackJoin> {
+fn get_all_modpack_joins(db: tauri::State<'_, DbState>) -> Vec<ModpackJoin> {
     let db = database::get_conn(db);
     ModpackJoin::get_all(&db)
+}
+
+#[tauri::command]
+fn get_mod_joins_from_modpack_id(id: i64, db: tauri::State<'_, DbState>) -> Vec<ModJoin> {
+    let db = database::get_conn(db);
+    ModJoin::get_from_modpack_version_id(&db, id)
+        .expect(format!("Should get all mod joins related to modpack with id: {id}").as_str())
 }
 
 #[tauri::command]

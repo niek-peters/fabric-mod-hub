@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/tauri';
 
-const res = await invoke('get_all_modpack_versions');
+const res = await invoke('get_all_modpack_joins');
 
 // Check if res is an array of modpackjoins
 let modpacks: ModpackJoin[] = [];

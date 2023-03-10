@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use derive_new::new;
 use rusqlite::Connection;
 use serde::Serialize;
@@ -24,7 +26,7 @@ impl ModJoin {
                 Ok(ModJoin {
                     id: row.get(0)?,
                     mod_id: row.get(1)?,
-                    version_id: row.get(1)?,
+                    version_id: row.get(2)?,
                     name: row.get(3)?,
                     slug: row.get(4)?,
                     game_version: row.get(5)?,
@@ -34,9 +36,37 @@ impl ModJoin {
             })
             .unwrap();
 
-        mod_joins_iter
-            .map(|mod_join| modpack_join.unwrap())
-            .collect()
+        mod_joins_iter.map(|mod_join| mod_join.unwrap()).collect()
+    }
+
+    pub fn get_from_modpack_version_id(
+        db: &Connection,
+        modpack_version_id: i64,
+    ) -> Result<Vec<ModJoin>, Box<dyn Error>> {
+        let get_all_mods =
+            include_str!("../../../sql/mod_versions/join_from_modpack_version_id.sql");
+
+        let mut stmt = db.prepare(get_all_mods).unwrap();
+        let mod_joins_iter = stmt
+            .query_map([modpack_version_id], |row| {
+                Ok(ModJoin {
+                    id: row.get(0)?,
+                    mod_id: row.get(1)?,
+                    version_id: row.get(2)?,
+                    name: row.get(3)?,
+                    slug: row.get(4)?,
+                    game_version: row.get(5)?,
+                    page_url: row.get(5)?,
+                    download_url: row.get(6)?,
+                })
+            })
+            .unwrap();
+
+        let mod_joins = mod_joins_iter
+            .map(|mod_join| mod_join.unwrap())
+            .collect::<Vec<ModJoin>>();
+
+        Ok(mod_joins)
     }
 
     pub fn get_one(db: &Connection, mod_version_id: i64) -> Result<ModJoin, Box<dyn Error>> {
@@ -47,7 +77,7 @@ impl ModJoin {
             Ok(ModJoin {
                 id: row.get(0)?,
                 mod_id: row.get(1)?,
-                version_id: row.get(1)?,
+                version_id: row.get(2)?,
                 name: row.get(3)?,
                 slug: row.get(4)?,
                 game_version: row.get(5)?,

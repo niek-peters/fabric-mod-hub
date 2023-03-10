@@ -9,6 +9,17 @@ declare global {
 		page_url: string;
 	};
 
+	type ModJoin = {
+		id: number | null;
+		mod_id: number;
+		version_id: string;
+		name: string;
+		slug: string;
+		game_version: string;
+		page_url: string;
+		download_url: string;
+	};
+
 	type Modpack = {
 		id: number | null;
 		name: string;

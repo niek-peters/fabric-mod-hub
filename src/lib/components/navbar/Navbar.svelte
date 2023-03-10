@@ -5,6 +5,8 @@
 	import Line from '$components/Line.svelte';
 	import NavButton from '$components/navbar/NavButton.svelte';
 	import ModButton from '$components/navbar/ModButton.svelte';
+
+	import { modpacks } from '$src/hooks.client';
 </script>
 
 <nav class="flex flex-col w-fit h-full bg-zinc-700/30 p-4">
@@ -21,10 +23,16 @@
 				/>
 			</div>
 			<section class="flex flex-col gap-4">
-				<ModButton id={1} name="Optimizations" version="1.19.2" loaded={true} />
-				<ModButton id={2} name="Multiplayer" version="1.19.2" />
-				<ModButton id={3} name="Hardcore" version="1.18.2" />
-				<ModButton id={4} name="QoL" version="1.18.2" />
+				{#each modpacks as modpack}
+					{#if modpack.id}
+						<ModButton
+							id={modpack.id}
+							name={modpack.name}
+							version={modpack.game_version}
+							loaded={modpack.loaded}
+						/>
+					{/if}
+				{/each}
 			</section>
 		</div>
 		<Line />

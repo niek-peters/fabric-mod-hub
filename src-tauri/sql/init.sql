@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS modpack_mods (
     modpack_id INTEGER NOT NULL,
     mod_id INTEGER NOT NULL,
     FOREIGN KEY (modpack_id) REFERENCES modpacks(id) ON DELETE CASCADE,
-    FOREIGN KEY (mod_id) REFERENCES mods(id) ON DELETE CASCADE
+    FOREIGN KEY (mod_id) REFERENCES mods(id) ON DELETE CASCADE,
+    CONSTRAINT modpack_mods_unique UNIQUE (modpack_id, mod_id)
 );
 
 CREATE TABLE IF NOT EXISTS mods (

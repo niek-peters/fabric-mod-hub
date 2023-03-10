@@ -7,8 +7,6 @@
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 	import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
-	import { modpacks } from '$src/hooks.client';
-
 	let debugMsg: any;
 	async function debug() {
 		try {
@@ -17,10 +15,6 @@
 			debugMsg = e;
 		}
 	}
-
-	onMount(() => {
-		console.log(modpacks);
-	});
 </script>
 
 <div class="flex flex-col flex-grow w-full gap-8">

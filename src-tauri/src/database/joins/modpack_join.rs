@@ -4,6 +4,8 @@ use derive_new::new;
 use rusqlite::Connection;
 use serde::Serialize;
 
+use super::ModJoin;
+
 #[derive(new, Serialize)]
 pub struct ModpackJoin {
     pub id: i64,

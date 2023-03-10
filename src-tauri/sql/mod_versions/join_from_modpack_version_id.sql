@@ -1,0 +1,1 @@
+SELECT mv.id, mv.mod_id, mv.version_id, m.name, m.slug, mv.game_version, m.page_url, mv.download_url FROM mods m INNER JOIN modpacks mp ON mp.id = ?1 INNER JOIN modpack_mods mpm ON mpm.mod_id = m.id INNER JOIN mod_versions mv ON m.id = mv.mod_id WHERE mpm.modpack_id = mp.id;

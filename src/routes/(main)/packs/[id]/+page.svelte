@@ -5,5 +5,9 @@
 </script>
 
 <div class="w-full h-full">
-	Pack {data.id}
+	<p>Pack {data.id}</p>
+	<p>Mods:</p>
+	{#each data.mods as mod}
+		<p>{mod.name}</p>
+	{/each}
 </div>
