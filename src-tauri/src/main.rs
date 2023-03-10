@@ -13,7 +13,8 @@ use tauri::Manager;
 
 mod database;
 use database::{
-    models::{Modpack, ModpackJoin, ModpackVersion, Saved, Settings},
+    joins::ModpackJoin,
+    models::{Modpack, ModpackVersion, Saved, Settings},
     Database,
 };
 

@@ -1,4 +1,5 @@
 pub mod errors;
+pub mod joins;
 pub mod models;
 
 use r2d2::{Pool, PooledConnection};

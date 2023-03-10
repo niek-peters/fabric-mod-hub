@@ -5,7 +5,6 @@ mod modpacks;
 mod mods;
 mod settings;
 
-mod modpack_join;
 
 pub use mod_versions::ModVersion;
 // pub use modpack_mods::ModpackMod;
@@ -14,7 +13,6 @@ pub use modpacks::Modpack;
 pub use mods::Mod;
 pub use settings::Settings;
 
-pub use modpack_join::ModpackJoin;
 
 // Organized view of the database structure
 // https://drawsql.app/teams/egel-developers/diagrams/main-2
