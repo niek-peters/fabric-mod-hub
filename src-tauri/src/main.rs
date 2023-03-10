@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use std::{error::Error, fmt::format};
+use std::error::Error;
 
 use dotenv::dotenv;
 use r2d2::PooledConnection;

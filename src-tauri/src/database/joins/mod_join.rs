@@ -17,27 +17,27 @@ pub struct ModJoin {
 }
 
 impl ModJoin {
-    pub fn get_all(db: &Connection) -> Vec<ModJoin> {
-        let get_all_mods = include_str!("../../../sql/mod_versions/join_all.sql");
+    // pub fn get_all(db: &Connection) -> Vec<ModJoin> {
+    //     let get_all_mods = include_str!("../../../sql/mod_versions/join_all.sql");
 
-        let mut stmt = db.prepare(get_all_mods).unwrap();
-        let mod_joins_iter = stmt
-            .query_map([], |row| {
-                Ok(ModJoin {
-                    id: row.get(0)?,
-                    mod_id: row.get(1)?,
-                    version_id: row.get(2)?,
-                    name: row.get(3)?,
-                    slug: row.get(4)?,
-                    game_version: row.get(5)?,
-                    page_url: row.get(5)?,
-                    download_url: row.get(6)?,
-                })
-            })
-            .unwrap();
+    //     let mut stmt = db.prepare(get_all_mods).unwrap();
+    //     let mod_joins_iter = stmt
+    //         .query_map([], |row| {
+    //             Ok(ModJoin {
+    //                 id: row.get(0)?,
+    //                 mod_id: row.get(1)?,
+    //                 version_id: row.get(2)?,
+    //                 name: row.get(3)?,
+    //                 slug: row.get(4)?,
+    //                 game_version: row.get(5)?,
+    //                 page_url: row.get(5)?,
+    //                 download_url: row.get(6)?,
+    //             })
+    //         })
+    //         .unwrap();
 
-        mod_joins_iter.map(|mod_join| mod_join.unwrap()).collect()
-    }
+    //     mod_joins_iter.map(|mod_join| mod_join.unwrap()).collect()
+    // }
 
     pub fn get_from_modpack_version_id(
         db: &Connection,
@@ -69,23 +69,23 @@ impl ModJoin {
         Ok(mod_joins)
     }
 
-    pub fn get_one(db: &Connection, mod_version_id: i64) -> Result<ModJoin, Box<dyn Error>> {
-        let get_one_mod = include_str!("../../../sql/mod_versions/join_one.sql");
+    // pub fn get_one(db: &Connection, mod_version_id: i64) -> Result<ModJoin, Box<dyn Error>> {
+    //     let get_one_mod = include_str!("../../../sql/mod_versions/join_one.sql");
 
-        let mut stmt = db.prepare(get_one_mod).unwrap();
-        let mod_join = stmt.query_row([mod_version_id], |row| {
-            Ok(ModJoin {
-                id: row.get(0)?,
-                mod_id: row.get(1)?,
-                version_id: row.get(2)?,
-                name: row.get(3)?,
-                slug: row.get(4)?,
-                game_version: row.get(5)?,
-                page_url: row.get(5)?,
-                download_url: row.get(6)?,
-            })
-        })?;
+    //     let mut stmt = db.prepare(get_one_mod).unwrap();
+    //     let mod_join = stmt.query_row([mod_version_id], |row| {
+    //         Ok(ModJoin {
+    //             id: row.get(0)?,
+    //             mod_id: row.get(1)?,
+    //             version_id: row.get(2)?,
+    //             name: row.get(3)?,
+    //             slug: row.get(4)?,
+    //             game_version: row.get(5)?,
+    //             page_url: row.get(5)?,
+    //             download_url: row.get(6)?,
+    //         })
+    //     })?;
 
-        Ok(mod_join)
-    }
+    //     Ok(mod_join)
+    // }
 }
