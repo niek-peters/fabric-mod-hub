@@ -5,10 +5,11 @@
 
 use std::error::Error;
 
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use r2d2::PooledConnection;
 use r2d2_sqlite::SqliteConnectionManager;
 use reqwest::Client;
+use rusqlite::Connection;
 use tauri::Manager;
 
 mod database;
@@ -51,6 +52,9 @@ fn main() {
                 // After it's done, close the splashscreen and display the main window
                 splashscreen_window.close().unwrap();
                 main_window.show().unwrap();
+                main_window
+                    .emit("loaded", get_all_modpack_joins(&mut db))
+                    .unwrap();
             });
 
             Ok(())
@@ -58,23 +62,20 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             test_request,
             get_all_modpacks,
-            get_all_modpack_joins,
             get_mod_joins_from_modpack_id
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
+fn get_all_modpack_joins(db: &mut Connection) -> Vec<ModpackJoin> {
+    ModpackJoin::get_all(db)
+}
+
 #[tauri::command]
 fn get_all_modpacks(db: tauri::State<'_, DbState>) -> Vec<Modpack<Saved>> {
     let db = database::get_conn(db);
     Modpack::get_all(&db)
-}
-
-#[tauri::command]
-fn get_all_modpack_joins(db: tauri::State<'_, DbState>) -> Vec<ModpackJoin> {
-    let db = database::get_conn(db);
-    ModpackJoin::get_all(&db)
 }
 
 #[tauri::command]

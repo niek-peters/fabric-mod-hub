@@ -2,7 +2,7 @@ use derive_new::new;
 use rusqlite::Connection;
 use serde::Serialize;
 
-#[derive(new, Serialize)]
+#[derive(new, Serialize, Clone)]
 pub struct ModpackJoin {
     pub id: i64,
     pub modpack_id: i64,
