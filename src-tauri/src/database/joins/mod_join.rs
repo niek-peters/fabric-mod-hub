@@ -38,4 +38,24 @@ impl ModJoin {
             .map(|mod_join| modpack_join.unwrap())
             .collect()
     }
+
+    pub fn get_one(db: &Connection, mod_version_id: i64) -> Result<ModJoin, Box<dyn Error>> {
+        let get_one_mod = include_str!("../../../sql/mod_versions/join_one.sql");
+
+        let mut stmt = db.prepare(get_one_mod).unwrap();
+        let mod_join = stmt.query_row([mod_version_id], |row| {
+            Ok(ModJoin {
+                id: row.get(0)?,
+                mod_id: row.get(1)?,
+                version_id: row.get(1)?,
+                name: row.get(3)?,
+                slug: row.get(4)?,
+                game_version: row.get(5)?,
+                page_url: row.get(5)?,
+                download_url: row.get(6)?,
+            })
+        })?;
+
+        Ok(mod_join)
+    }
 }
