@@ -9,12 +9,13 @@
 	export let loaded: boolean = false;
 
 	let href = `/packs/${id}`;
+	let routeId = `/(main)/packs/${id}`;
 </script>
 
 <a
 	{href}
 	class="relative flex items-center justify-between gap-4 py-2 px-4 rounded-md long-transition {$page
-		.route.id && $page.route.id.replace('[id]', $page.params.id) === href
+		.route.id && $page.route.id.replace('[id]', $page.params.id) === routeId
 		? 'bg-zinc-700'
 		: 'bg-zinc-700/50 hover:bg-zinc-700/30'}"
 >
