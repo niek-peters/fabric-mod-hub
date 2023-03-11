@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { open } from '@tauri-apps/api/shell';
 	import { invoke } from '@tauri-apps/api/tauri';
 
@@ -32,9 +31,7 @@
 					<span class="font-semibold">1.19.2</span>
 				</div>
 				<section class="flex items-center">
-					<span class="flex items-center bg-creeper/80 px-4 py-px rounded-full text-md"
-						>Pre-made</span
-					>
+					<span class="flex items-center bg-sky-900 px-4 py-px rounded-full text-md">Pre-made</span>
 				</section>
 			</section>
 			<section class="flex flex-col gap-4 w-1/3">

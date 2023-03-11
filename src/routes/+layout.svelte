@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 
 	onMount(() => {
-		if (document) document.addEventListener('contextmenu', (event) => event.preventDefault());
+		// if (document) document.addEventListener('contextmenu', (event) => event.preventDefault());
 	});
 </script>
 

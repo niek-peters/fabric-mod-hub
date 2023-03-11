@@ -30,8 +30,8 @@ impl ModJoin {
     //                 name: row.get(3)?,
     //                 slug: row.get(4)?,
     //                 game_version: row.get(5)?,
-    //                 page_url: row.get(5)?,
-    //                 download_url: row.get(6)?,
+    //                 page_url: row.get(6)?,
+    //                 download_url: row.get(7)?,
     //             })
     //         })
     //         .unwrap();
@@ -56,8 +56,8 @@ impl ModJoin {
                     name: row.get(3)?,
                     slug: row.get(4)?,
                     game_version: row.get(5)?,
-                    page_url: row.get(5)?,
-                    download_url: row.get(6)?,
+                    page_url: row.get(6)?,
+                    download_url: row.get(7)?,
                 })
             })
             .unwrap();
@@ -81,8 +81,8 @@ impl ModJoin {
     //             name: row.get(3)?,
     //             slug: row.get(4)?,
     //             game_version: row.get(5)?,
-    //             page_url: row.get(5)?,
-    //             download_url: row.get(6)?,
+    //             page_url: row.get(6)?,
+    //             download_url: row.get(7)?,
     //         })
     //     })?;
 

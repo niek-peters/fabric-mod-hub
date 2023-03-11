@@ -30,7 +30,7 @@ impl Mod {
 
         let mod_res = res.json::<ModResponse>().await?;
 
-        let page_url = format!("https://modrinth.com/mod/{}", mod_id);
+        let page_url = format!("https://modrinth.com/mod/{}", mod_res.slug);
 
         if mod_res.project_type == "mod" && mod_res.status == "approved" {
             Ok(Mod::new(mod_id, mod_res.title, mod_res.slug, page_url))
