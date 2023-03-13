@@ -10,7 +10,7 @@ declare global {
 	};
 
 	type ModJoin = {
-		id: number | null;
+		id: number;
 		mod_id: number;
 		version_id: string;
 		name: string;
@@ -28,7 +28,7 @@ declare global {
 	};
 
 	type ModpackJoin = {
-		id: number | null;
+		id: number;
 		modpack_id: number;
 		name: string;
 		slug: string;

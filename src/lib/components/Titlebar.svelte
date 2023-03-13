@@ -14,10 +14,10 @@
 	</section>
 	<section class="flex gap-4">
 		<button on:click={() => appWindow.minimize()}>
-			<Fa class="text-zinc-500 hover:text-zinc-400 long-transition" icon={faMinus} />
+			<Fa class="text-zinc-500 hover:text-zinc-400 transition duration-300" icon={faMinus} />
 		</button>
 		<button on:click={() => appWindow.close()}>
-			<Fa class="text-zinc-500 hover:text-zinc-400 long-transition" icon={faXmark} />
+			<Fa class="text-zinc-500 hover:text-zinc-400 transition duration-300" icon={faXmark} />
 		</button>
 	</section>
 </div>

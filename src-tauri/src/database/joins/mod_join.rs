@@ -39,7 +39,7 @@ impl ModJoin {
     //     mod_joins_iter.map(|mod_join| mod_join.unwrap()).collect()
     // }
 
-    pub fn get_from_modpack_version_id(
+    pub fn from_modpack_version_id(
         db: &Connection,
         modpack_version_id: i64,
     ) -> Result<Vec<ModJoin>, Box<dyn Error>> {

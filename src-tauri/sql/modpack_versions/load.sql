@@ -1,0 +1,1 @@
+UPDATE modpack_versions SET loaded = true WHERE id = ?1;

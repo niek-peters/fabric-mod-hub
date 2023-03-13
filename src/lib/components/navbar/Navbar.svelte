@@ -6,7 +6,7 @@
 	import NavButton from '$components/navbar/NavButton.svelte';
 	import ModButton from '$components/navbar/ModButton.svelte';
 
-	export let modpacks: ModpackJoin[] | undefined;
+	export let modpacks: ModpackJoin[];
 </script>
 
 <nav class="flex flex-col w-fit h-full bg-zinc-700/30 p-4">
@@ -23,7 +23,7 @@
 				/>
 			</div>
 			<section class="flex flex-col gap-4">
-				{#if modpacks}
+				{#if modpacks.length}
 					{#each modpacks as modpack}
 						{#if modpack.id}
 							<ModButton

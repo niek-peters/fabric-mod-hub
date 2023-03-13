@@ -61,7 +61,9 @@ fn main() {
             test_request,
             get_all_modpacks,
             get_all_modpack_joins,
-            get_mod_joins_from_modpack_version_id
+            get_mod_joins,
+            load_modpack_version,
+            unload_modpack_versions
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -80,10 +82,22 @@ fn get_all_modpacks(db: tauri::State<'_, DbState>) -> Vec<Modpack<Saved>> {
 }
 
 #[tauri::command]
-fn get_mod_joins_from_modpack_version_id(id: i64, db: tauri::State<'_, DbState>) -> Vec<ModJoin> {
+fn get_mod_joins(id: i64, db: tauri::State<'_, DbState>) -> Vec<ModJoin> {
     let db = database::get_conn(db);
-    ModJoin::get_from_modpack_version_id(&db, id)
+    ModJoin::from_modpack_version_id(&db, id)
         .expect(format!("Should get all mod joins related to modpack with id: {id}").as_str())
+}
+
+#[tauri::command]
+fn load_modpack_version(id: i64, db: tauri::State<'_, DbState>) -> Result<(), String> {
+    let mut db = database::get_conn(db);
+    ModpackVersion::load(id, &mut db).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn unload_modpack_versions(db: tauri::State<'_, DbState>) -> Result<(), String> {
+    let db = database::get_conn(db);
+    ModpackVersion::unload_all(&db).map_err(|e| e.to_string())
 }
 
 #[tauri::command]

@@ -11,7 +11,7 @@
 
 	export let data: LayoutData;
 
-	onMount(async () => {
+	onMount(() => {
 		let window = WebviewWindow.getByLabel('main');
 
 		if (window) onVisible(window, getModpackJoins);
@@ -25,6 +25,8 @@
 			setModpackJoins(res);
 		}
 	}
+
+	$: $modpackJoins, console.log($modpackJoins);
 </script>
 
 <Titlebar />

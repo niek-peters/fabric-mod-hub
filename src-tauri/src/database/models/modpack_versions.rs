@@ -56,3 +56,29 @@ impl ModpackVersion<NotSaved> {
         })
     }
 }
+
+impl ModpackVersion {
+    pub fn load(modpack_version_id: i64, db: &mut Connection) -> Result<(), Box<dyn Error>> {
+        let unload_all_modpack_versions =
+            include_str!("../../../sql/modpack_versions/unload_all.sql");
+        let load_modpack_version = include_str!("../../../sql/modpack_versions/load.sql");
+
+        let tx = db.transaction()?;
+
+        tx.execute(unload_all_modpack_versions, [])?;
+        tx.execute(load_modpack_version, params![modpack_version_id])?;
+
+        tx.commit()?;
+
+        Ok(())
+    }
+
+    pub fn unload_all(db: &Connection) -> Result<(), Box<dyn Error>> {
+        let unload_all_modpack_versions =
+            include_str!("../../../sql/modpack_versions/unload_all.sql");
+
+        db.execute(unload_all_modpack_versions, [])?;
+
+        Ok(())
+    }
+}
