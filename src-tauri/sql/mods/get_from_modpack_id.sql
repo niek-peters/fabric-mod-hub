@@ -1,1 +1,1 @@
-SELECT m.id, m.name, m.slug, m.page_url FROM mods m INNER JOIN modpack_mods mm ON mm.mod_id = m.id mm.modpack_id = ?1;
+SELECT m.id, m.name, m.slug, m.page_url FROM mods m INNER JOIN modpack_mods mm ON mm.mod_id = m.id WHERE mm.modpack_id = ?1;

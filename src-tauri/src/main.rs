@@ -3,24 +3,31 @@
     windows_subsystem = "windows"
 )]
 
-use std::error::Error;
-
-use dotenvy::dotenv;
-use r2d2::PooledConnection;
-use r2d2_sqlite::SqliteConnectionManager;
-use reqwest::Client;
-use tauri::Manager;
-
-mod database;
 use database::{
     joins::{ModJoin, ModpackJoin},
     models::{Modpack, ModpackVersion, Saved, Settings},
     Database,
 };
+use dotenvy::dotenv;
+use r2d2::PooledConnection;
+use r2d2_sqlite::SqliteConnectionManager;
+use reqwest::Client;
+use std::fs::File;
+use std::{
+    error::Error,
+    io::{self, Cursor},
+};
+use tauri::Manager;
+use uuid::Uuid;
 
+mod database;
+mod files;
 mod requests;
+
 pub struct DbState(Database);
 pub struct ReqState(Client);
+
+const USER_AGENT: &str = "MrValk/fabric-mod-hub/0.0.1 (n.s.peters05@gmail.com)";
 
 fn main() {
     dotenv().ok();
@@ -28,7 +35,12 @@ fn main() {
     tauri::Builder::default()
         .setup(|app| {
             app.manage(DbState(Database::init(&app.handle())));
-            app.manage(ReqState(Client::new()));
+            app.manage(ReqState(
+                Client::builder()
+                    .user_agent(USER_AGENT)
+                    .build()
+                    .expect("Should build reqwest client"),
+            ));
 
             // Initialize settings
             let client = &app.state::<ReqState>().0;
@@ -44,11 +56,12 @@ fn main() {
             main_window.hide().unwrap();
 
             let client_clone = client.clone();
+            let app_handle = app.handle().clone();
 
             // we perform the initialization code on a new task so the app doesn't freeze
             tauri::async_runtime::spawn(async move {
                 // Initialize default modpacks
-                create_default_modpack_versions(&client_clone, &mut db).await;
+                create_default_modpack_versions(&app_handle, &client_clone, &mut db).await;
 
                 // After it's done, close the splashscreen and display the main window
                 splashscreen_window.close().unwrap();
@@ -102,33 +115,34 @@ fn unload_modpack_versions(db: tauri::State<'_, DbState>) -> Result<(), String> 
 
 #[tauri::command]
 async fn test_request(
+    app: tauri::AppHandle,
     client: tauri::State<'_, ReqState>,
-    db: tauri::State<'_, DbState>,
-) -> Result<ModpackVersion<Saved>, String> {
-    let client = &client.0;
-    let mut db = database::get_conn(db);
-
-    test(client, &mut db).await.map_err(|e| e.to_string())
+) -> Result<(), String> {
+    test(&app.app_handle(), &client.0)
+        .await
+        .map_err(|e| e.to_string())
 }
 
-async fn test(
-    client: &Client,
-    db: &mut PooledConnection<SqliteConnectionManager>,
-) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
-    let modpack = Modpack::create(
-        client,
-        db,
-        "Test2".to_string(),
-        "test2".to_string(),
-        true,
-        vec!["ssUbhMkL".to_string()],
-    )
-    .await?;
+async fn test(app_handle: &tauri::AppHandle, client: &Client) -> Result<(), Box<dyn Error>> {
+    let mut path = files::get_data_path(app_handle);
 
-    modpack.create_version(client, db, "1.19.2").await
+    let name = Uuid::new_v4().to_string();
+
+    let res = client.get("https://cdn.modrinth.com/data/9eGKb6K1/versions/6kP3jszz/voicechat-fabric-1.19.4-rc3-2.3.28.jar").send().await?;
+    let (_, name) = res.url().path().rsplit_once('/').unwrap_or(("", &name));
+
+    path.push(name);
+
+    let bytes = res.bytes().await?;
+    let mut file = File::create(path)?;
+    let mut content = Cursor::new(bytes);
+    io::copy(&mut content, &mut file)?;
+
+    Ok(())
 }
 
 async fn create_default_modpack_versions(
+    app_handle: &tauri::AppHandle,
     client: &Client,
     db: &mut PooledConnection<SqliteConnectionManager>,
 ) {
@@ -146,8 +160,11 @@ async fn create_default_modpack_versions(
     )
     .await
     .unwrap();
-
-    modpack1.create_version(client, db, "1.19.2").await.unwrap();
+    let modpack_version1 = modpack1.create_version(client, db, "1.19.2").await.unwrap();
+    modpack_version1
+        .download(app_handle, db, client)
+        .await
+        .unwrap();
 
     let modpack2 = Modpack::create(
         client,
@@ -159,6 +176,25 @@ async fn create_default_modpack_versions(
     )
     .await
     .unwrap();
+    let modpack_version2 = modpack2.create_version(client, db, "1.19.2").await.unwrap();
+    modpack_version2
+        .download(app_handle, db, client)
+        .await
+        .unwrap();
 
-    modpack2.create_version(client, db, "1.19.2").await.unwrap();
+    let modpack3 = Modpack::create(
+        client,
+        db,
+        "Death".to_string(),
+        "death".to_string(),
+        true,
+        vec!["ssUbhMkL".to_string()],
+    )
+    .await
+    .unwrap();
+    let modpack_version3 = modpack3.create_version(client, db, "1.19.3").await.unwrap();
+    modpack_version3
+        .download(app_handle, db, client)
+        .await
+        .unwrap();
 }

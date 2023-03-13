@@ -5,7 +5,7 @@ use std::{error::Error, marker::PhantomData};
 
 use crate::database::errors;
 
-use super::{NotSaved, Saved};
+use super::{ModVersion, NotSaved, Saved};
 
 #[derive(new, Serialize)]
 pub struct ModpackVersion<State = NotSaved> {
@@ -80,5 +80,36 @@ impl ModpackVersion {
         db.execute(unload_all_modpack_versions, [])?;
 
         Ok(())
+    }
+}
+
+impl ModpackVersion<Saved> {
+    pub fn get_mod_versions(
+        &self,
+        db: &Connection,
+    ) -> Result<Vec<ModVersion<Saved>>, Box<dyn Error>> {
+        let get_mod_versions =
+            include_str!("../../../sql/mod_versions/from_modpack_version_id.sql");
+
+        let mut stmt = db.prepare(get_mod_versions)?;
+        let rows = stmt.query_map(params![self.id], |row| {
+            Ok(ModVersion {
+                id: Some(row.get(0)?),
+                mod_id: row.get(1)?,
+                version_id: row.get(2)?,
+                game_version: row.get(3)?,
+                download_url: row.get(4)?,
+                dependency_of: row.get(5)?,
+                state: PhantomData::<Saved>,
+            })
+        })?;
+
+        let mut mod_versions = Vec::new();
+
+        for row in rows {
+            mod_versions.push(row?);
+        }
+
+        Ok(mod_versions)
     }
 }

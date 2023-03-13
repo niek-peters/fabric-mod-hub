@@ -1,11 +1,13 @@
 use std::error::Error;
 
+use async_recursion::async_recursion;
 use reqwest::Client;
+use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 
 use crate::database::models::{Mod, ModVersion, Saved};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct VersionResponse {
     id: String,
     game_versions: Vec<String>,
@@ -16,23 +18,27 @@ struct VersionResponse {
     dependencies: Vec<Dependency>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct File {
     url: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 struct Dependency {
+    project_id: Option<String>,
     version_id: Option<String>,
     dependency_type: String,
 }
 
 impl Mod<Saved> {
+    #[async_recursion]
     pub async fn get_version(
         &self,
         client: &Client,
+        db: &mut Connection,
         game_version: &str,
-    ) -> Result<ModVersion, Box<dyn Error>> {
+        dependency_of: Option<i64>,
+    ) -> Result<ModVersion<Saved>, Box<dyn Error>> {
         let id = self.id.expect("Saved mod should have an id");
 
         let res = client
@@ -66,24 +72,53 @@ impl Mod<Saved> {
         }
 
         match latest_version {
-            Some(version) => Ok(ModVersion::new(
-                id,
-                version.id,
-                game_version.to_string(),
-                version.files[0].url.to_string(),
-                version
+            Some(version) => {
+                let mod_version = ModVersion::new(
+                    id,
+                    version.id,
+                    game_version.to_string(),
+                    version.files[0].url.to_string(),
+                    dependency_of,
+                )
+                .save(db)?;
+
+                let dependencies: Vec<Dependency> = version
                     .dependencies
                     .iter()
-                    .filter(|d| d.dependency_type != "optional" && d.version_id.is_some())
-                    .map(|d| {
-                        d.version_id
-                            .as_ref()
-                            .expect("version_id should be Some")
-                            .to_string()
-                    })
-                    .collect(),
-            )),
-            None => Err("This mod version is not available".into()),
+                    .filter(|d| d.dependency_type != "optional")
+                    .cloned()
+                    .collect();
+
+                for dependency in dependencies {
+                    match dependency.project_id {
+                        Some(dependency_id) => {
+                            let mod1 = Mod::from_project_id(&client, dependency_id)
+                                .await?
+                                .save(db)?;
+
+                            mod1.get_version(client, db, game_version, mod_version.id)
+                                .await?;
+                        }
+                        None => match dependency.version_id {
+                            Some(version_id) => {
+                                let mod1 =
+                                    Mod::from_version_id(&client, version_id).await?.save(db)?;
+
+                                mod1.get_version(client, db, game_version, mod_version.id)
+                                    .await?;
+                            }
+                            None => {
+                                return Err(
+                                    "Mod.get_version: This dependency is not available".into()
+                                );
+                            }
+                        },
+                    }
+                }
+
+                Ok(mod_version)
+            }
+            None => Err("Mod.get_version: This mod version is not available".into()),
         }
     }
 }

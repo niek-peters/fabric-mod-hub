@@ -13,6 +13,11 @@ struct ModResponse {
     status: String,
 }
 
+#[derive(Serialize, Deserialize)]
+struct VersionResponse {
+    project_id: String,
+}
+
 impl Mod {
     pub async fn from_project_id(client: &Client, mod_id: String) -> Result<Self, Box<dyn Error>> {
         let res = client
@@ -37,5 +42,30 @@ impl Mod {
         } else {
             Err("Mod_id does not point to listed mod".into())
         }
+    }
+
+    pub async fn from_version_id(
+        client: &Client,
+        version_id: String,
+    ) -> Result<Self, Box<dyn Error>> {
+        let res = client
+            .get(format!(
+                "https://api.modrinth.com/v2/version/{}",
+                version_id
+            ))
+            .send()
+            .await?;
+
+        if !res.status().is_success() {
+            return Err(format!(
+                "Mod::from_version_id: Modrinth API returned non-success status: {}",
+                res.status()
+            )
+            .into());
+        }
+
+        let version_res = res.json::<VersionResponse>().await?;
+
+        Self::from_project_id(client, version_res.project_id).await
     }
 }

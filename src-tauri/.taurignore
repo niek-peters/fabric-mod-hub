@@ -1,1 +1,2 @@
-dev.sqlite3
+/data/
+*.jar

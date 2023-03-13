@@ -93,12 +93,14 @@ impl Modpack<Saved> {
         db: &mut Connection,
         game_version: &str,
     ) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
+        let id = self.id.expect("Saved modpack should have an id");
+
         // Get all ModVersions from modpack's list of mods and save them
         for mod1 in &self.mods {
-            mod1.get_version(client, game_version).await?.save(db)?;
+            mod1.get_version(client, db, game_version, None).await?;
         }
 
-        self.get_version(game_version).save(db)
+        Ok(ModpackVersion::new(id, game_version.to_string()).save(db)?)
     }
 }
 

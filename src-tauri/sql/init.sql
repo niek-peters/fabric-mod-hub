@@ -40,7 +40,9 @@ CREATE TABLE IF NOT EXISTS mod_versions (
     version_id VARCHAR(63) UNIQUE NOT NULL,
     game_version VARCHAR(63) NOT NULL,
     download_url VARCHAR(63) NOT NULL,
-    FOREIGN KEY (mod_id) REFERENCES mods(id) ON DELETE CASCADE
+    dependency_of INTEGER,
+    FOREIGN KEY (mod_id) REFERENCES mods(id) ON DELETE CASCADE,
+    FOREIGN KEY (dependency_of) REFERENCES mod_versions(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS settings (
