@@ -1,4 +1,4 @@
-use std::{error::Error, fs};
+use std::{error::Error, fs, path::Path};
 
 use reqwest::Client;
 use rusqlite::Connection;
@@ -13,6 +13,11 @@ impl ModpackVersion<Saved> {
         client: &Client,
     ) -> Result<(), Box<dyn Error>> {
         let id = self.id.expect("Saved ModpackVersion should have an id");
+
+        // Don't download if already downloaded
+        if Self::is_downloaded(id, app_handle) {
+            return Ok(());
+        }
 
         let mod_versions = self.get_mod_versions(db)?;
 
@@ -33,5 +38,13 @@ impl ModpackVersion<Saved> {
         }
 
         Ok(())
+    }
+
+    pub fn is_downloaded(id: i64, app_handle: &tauri::AppHandle) -> bool {
+        let mut path = super::get_data_path(app_handle);
+        let dir_name = format!("{}/", id);
+        path.push(dir_name);
+
+        Path::new(&path).exists()
     }
 }

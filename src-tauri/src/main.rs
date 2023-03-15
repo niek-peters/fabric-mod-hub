@@ -102,9 +102,13 @@ fn get_mod_joins(id: i64, db: tauri::State<'_, DbState>) -> Vec<ModJoin> {
 }
 
 #[tauri::command]
-fn load_modpack_version(id: i64, db: tauri::State<'_, DbState>) -> Result<(), String> {
+fn load_modpack_version(
+    id: i64,
+    app_handle: tauri::AppHandle,
+    db: tauri::State<'_, DbState>,
+) -> Result<(), String> {
     let mut db = database::get_conn(db);
-    ModpackVersion::load(id, &mut db).map_err(|e| e.to_string())
+    ModpackVersion::load(id, &app_handle, &mut db).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -197,4 +201,6 @@ async fn create_default_modpack_versions(
         .download(app_handle, db, client)
         .await
         .unwrap();
+
+    println!("Minecraft dir: {}", files::get_mc_path().display())
 }
