@@ -6,7 +6,7 @@ use rusqlite::Connection;
 use crate::database::models::{ModVersion, ModpackVersion, Saved};
 
 impl ModpackVersion<Saved> {
-    pub async fn download(
+    pub async fn install(
         &self,
         app_handle: &tauri::AppHandle,
         db: &mut Connection,
@@ -15,7 +15,7 @@ impl ModpackVersion<Saved> {
         let id = self.id.expect("Saved ModpackVersion should have an id");
 
         // Don't download if already downloaded
-        if Self::is_downloaded(id, app_handle) {
+        if Self::is_installed(id, app_handle) {
             return Ok(());
         }
 
@@ -40,7 +40,7 @@ impl ModpackVersion<Saved> {
         Ok(())
     }
 
-    pub fn is_downloaded(id: i64, app_handle: &tauri::AppHandle) -> bool {
+    pub fn is_installed(id: i64, app_handle: &tauri::AppHandle) -> bool {
         let mut path = super::get_data_path(app_handle);
         let dir_name = format!("{}/", id);
         path.push(dir_name);

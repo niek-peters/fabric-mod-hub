@@ -12,8 +12,10 @@
 
 <a
 	{href}
-	class="flex items-center gap-4 py-2 px-4 rounded-md transition duration-300 {$page.route.id ===
-	routeId
+	class="flex items-center gap-4 py-2 px-4 rounded-md transition duration-300 {(routeId !==
+		'/(main)' &&
+		$page.route.id?.includes(routeId)) ||
+	$page.route.id === routeId
 		? 'bg-zinc-600/80'
 		: 'bg-zinc-700/50 hover:bg-zinc-700'}"
 >

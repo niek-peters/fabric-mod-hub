@@ -18,15 +18,13 @@
 	});
 
 	async function getModpackJoins() {
-		let res = await invoke('get_all_modpack_joins');
+		const res = await invoke('get_all_modpack_joins');
 
 		// Check if res is an array of modpackjoins
 		if (Array.isArray(res)) {
 			setModpackJoins(res);
 		}
 	}
-
-	$: $modpackJoins, console.log($modpackJoins);
 </script>
 
 <Titlebar />

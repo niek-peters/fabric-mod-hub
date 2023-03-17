@@ -74,12 +74,20 @@ fn main() {
             test_request,
             get_all_modpacks,
             get_all_modpack_joins,
+            get_modpack_game_versions,
+            install_modpack,
             get_mod_joins,
             load_modpack_version,
-            unload_modpack_versions
+            unload_modpack_versions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[tauri::command]
+fn get_all_modpacks(db: tauri::State<'_, DbState>) -> Vec<Modpack<Saved>> {
+    let db = database::get_conn(db);
+    Modpack::get_all(&db)
 }
 
 #[tauri::command]
@@ -89,9 +97,45 @@ fn get_all_modpack_joins(db: tauri::State<'_, DbState>) -> Vec<ModpackJoin> {
 }
 
 #[tauri::command]
-fn get_all_modpacks(db: tauri::State<'_, DbState>) -> Vec<Modpack<Saved>> {
+async fn get_modpack_game_versions(
+    id: i64,
+    client: tauri::State<'_, ReqState>,
+    db: tauri::State<'_, DbState>,
+) -> Result<Vec<String>, String> {
     let db = database::get_conn(db);
-    Modpack::get_all(&db)
+
+    let modpack = Modpack::from_id(&db, id)
+        .expect(format!("Should get the modpack related with id: {id}").as_str());
+
+    modpack
+        .get_game_versions(&client.0)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+async fn install_modpack(
+    id: i64,
+    game_version: &str,
+    app_handle: tauri::AppHandle,
+    client: tauri::State<'_, ReqState>,
+    db: tauri::State<'_, DbState>,
+) -> Result<(), String> {
+    let client = &client.0;
+    let mut db = database::get_conn(db);
+
+    let modpack = Modpack::from_id(&db, id)
+        .expect(format!("Should get the modpack related with id: {id}").as_str());
+
+    let modpack_version = modpack
+        .create_version(client, &mut db, game_version)
+        .await
+        .expect("Should create modpack version");
+
+    modpack_version
+        .install(&app_handle, &mut db, client)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -166,7 +210,7 @@ async fn create_default_modpack_versions(
     .unwrap();
     let modpack_version1 = modpack1.create_version(client, db, "1.19.2").await.unwrap();
     modpack_version1
-        .download(app_handle, db, client)
+        .install(app_handle, db, client)
         .await
         .unwrap();
 
@@ -182,7 +226,7 @@ async fn create_default_modpack_versions(
     .unwrap();
     let modpack_version2 = modpack2.create_version(client, db, "1.19.2").await.unwrap();
     modpack_version2
-        .download(app_handle, db, client)
+        .install(app_handle, db, client)
         .await
         .unwrap();
 
@@ -198,7 +242,7 @@ async fn create_default_modpack_versions(
     .unwrap();
     let modpack_version3 = modpack3.create_version(client, db, "1.19.3").await.unwrap();
     modpack_version3
-        .download(app_handle, db, client)
+        .install(app_handle, db, client)
         .await
         .unwrap();
 

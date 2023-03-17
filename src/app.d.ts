@@ -2,7 +2,7 @@
 // for information about these interfaces
 declare global {
 	type Mod = {
-		id: number | null;
+		id: number;
 		project_id: string;
 		name: string;
 		slug: string;
@@ -21,7 +21,7 @@ declare global {
 	};
 
 	type Modpack = {
-		id: number | null;
+		id: number;
 		name: string;
 		slug: string;
 		premade: boolean;
@@ -36,6 +36,21 @@ declare global {
 		premade: boolean;
 		installed: boolean;
 		loaded: boolean;
+	};
+
+	type NewMod = {
+		id: null;
+		project_id: string;
+		name: string;
+		slug: string;
+		page_url: string;
+	};
+
+	type NewModpack = {
+		id: null;
+		name: string;
+		slug: string;
+		premade: boolean;
 	};
 
 	namespace App {

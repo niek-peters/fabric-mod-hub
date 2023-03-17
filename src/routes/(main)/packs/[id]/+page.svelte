@@ -8,7 +8,7 @@
 	import { modpackJoins, loadFromVersionId, unload } from '$stores/modpackJoins';
 	export let data: PageData;
 
-	$: modpackJoin = $modpackJoins.find((join) => join.modpack_id === data.id);
+	$: modpackJoin = $modpackJoins.find((join) => join.id === data.id);
 </script>
 
 {#if modpackJoin}

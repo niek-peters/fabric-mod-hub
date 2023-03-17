@@ -70,7 +70,7 @@ impl ModpackVersion {
         Self::unload_all(&tx)?;
 
         // Check if the version has been downloaded
-        if !ModpackVersion::is_downloaded(modpack_version_id, app_handle) {
+        if !ModpackVersion::is_installed(modpack_version_id, app_handle) {
             return Err("Cannot load modpack version that hasn't been downloaded".into());
         }
 

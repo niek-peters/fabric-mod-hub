@@ -112,17 +112,41 @@ impl Modpack {
 
         let modpack_iter = stmt
             .query_map(params![], |row| {
+                let id = row.get(0)?;
+                let mods = Mod::from_modpack_id(id, db).unwrap();
+
                 Ok(Modpack {
-                    id: Some(row.get(0)?),
+                    id: Some(id),
                     name: row.get(1)?,
                     slug: row.get(2)?,
                     premade: row.get(3)?,
-                    mods: Vec::new(),
+                    mods,
                     state: PhantomData::<Saved>,
                 })
             })
             .unwrap();
 
         modpack_iter.map(|modpack| modpack.unwrap()).collect()
+    }
+
+    pub fn from_id(db: &Connection, id: i64) -> Result<Modpack<Saved>, Box<dyn Error>> {
+        let get_modpack = include_str!("../../../sql/modpacks/get_from_id.sql");
+
+        let mut stmt = db.prepare(get_modpack)?;
+
+        let mods = Mod::from_modpack_id(id, db)?;
+
+        let modpack = stmt.query_row(params![id], |row| {
+            Ok(Modpack {
+                id: Some(row.get(0)?),
+                name: row.get(1)?,
+                slug: row.get(2)?,
+                premade: row.get(3)?,
+                mods,
+                state: PhantomData::<Saved>,
+            })
+        })?;
+
+        Ok(modpack)
     }
 }
