@@ -4,7 +4,7 @@ use derive_new::new;
 use rusqlite::Connection;
 use serde::Serialize;
 
-#[derive(new, Serialize)]
+#[derive(new, Serialize, Debug, Clone)]
 pub struct ModJoin {
     pub id: i64,
     pub mod_id: i64,
@@ -62,11 +62,27 @@ impl ModJoin {
             })
             .unwrap();
 
-        let mod_joins = mod_joins_iter
+        let mut mod_joins = mod_joins_iter
             .map(|mod_join| mod_join.unwrap())
             .collect::<Vec<ModJoin>>();
+        mod_joins.reverse();
 
-        Ok(mod_joins)
+        let mut mod_ids: Vec<i64> = Vec::new();
+        let mut filtered_mod_joins = mod_joins
+            .iter()
+            .filter(|mod_join| {
+                if mod_ids.contains(&mod_join.mod_id) {
+                    return false;
+                } else {
+                    mod_ids.push(mod_join.mod_id);
+                    return true;
+                }
+            })
+            .cloned()
+            .collect::<Vec<ModJoin>>();
+        filtered_mod_joins.reverse();
+
+        Ok(filtered_mod_joins)
     }
 
     // pub fn get_one(db: &Connection, mod_version_id: i64) -> Result<ModJoin, Box<dyn Error>> {
