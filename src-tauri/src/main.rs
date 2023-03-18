@@ -5,12 +5,13 @@
 
 use database::{
     joins::{ModJoin, ModpackJoin},
-    models::{Modpack, ModpackVersion, Saved, Settings},
+    models::{Mod, Modpack, ModpackVersion, NotSaved, Saved, Settings},
     Database,
 };
 use dotenvy::dotenv;
 use r2d2::PooledConnection;
 use r2d2_sqlite::SqliteConnectionManager;
+use requests::search;
 use reqwest::Client;
 use std::fs::File;
 use std::{
@@ -71,7 +72,6 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            test_request,
             get_all_modpacks,
             get_all_modpack_joins,
             get_modpack_game_versions,
@@ -79,7 +79,8 @@ fn main() {
             get_mod_joins,
             load_modpack_version,
             unload_modpack_versions,
-            uninstall_modpack_version
+            uninstall_modpack_version,
+            search
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -175,31 +176,13 @@ fn uninstall_modpack_version(id: i64, app_handle: tauri::AppHandle, db: tauri::S
 }
 
 #[tauri::command]
-async fn test_request(
-    app: tauri::AppHandle,
+async fn search(
+    query: String,
     client: tauri::State<'_, ReqState>,
-) -> Result<(), String> {
-    test(&app.app_handle(), &client.0)
+) -> Result<Vec<Mod<NotSaved>>, String> {
+    search::run(&client.0, query)
         .await
         .map_err(|e| e.to_string())
-}
-
-async fn test(app_handle: &tauri::AppHandle, client: &Client) -> Result<(), Box<dyn Error>> {
-    let mut path = files::get_data_path(app_handle);
-
-    let name = Uuid::new_v4().to_string();
-
-    let res = client.get("https://cdn.modrinth.com/data/9eGKb6K1/versions/6kP3jszz/voicechat-fabric-1.19.4-rc3-2.3.28.jar").send().await?;
-    let (_, name) = res.url().path().rsplit_once('/').unwrap_or(("", &name));
-
-    path.push(name);
-
-    let bytes = res.bytes().await?;
-    let mut file = File::create(path)?;
-    let mut content = Cursor::new(bytes);
-    io::copy(&mut content, &mut file)?;
-
-    Ok(())
 }
 
 async fn create_default_modpack_versions(

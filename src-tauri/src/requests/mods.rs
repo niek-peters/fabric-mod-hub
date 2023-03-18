@@ -35,9 +35,9 @@ impl Mod {
 
         let mod_res = res.json::<ModResponse>().await?;
 
-        let page_url = format!("https://modrinth.com/mod/{}", mod_res.slug);
+        let page_url = format!("https://modrinth.com/mod/{}", mod_id);
 
-        if mod_res.project_type == "mod" && mod_res.status == "approved" {
+        if mod_res.project_type == "mod" {
             Ok(Mod::new(mod_id, mod_res.title, mod_res.slug, page_url))
         } else {
             Err("Mod_id does not point to listed mod".into())
