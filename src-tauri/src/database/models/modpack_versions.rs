@@ -1,4 +1,6 @@
 use derive_new::new;
+use r2d2::PooledConnection;
+use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::{params, Connection};
 use serde::Serialize;
 use std::{error::Error, fs, marker::PhantomData, path::Path};
@@ -173,6 +175,27 @@ impl ModpackVersion {
 
         Ok(())
     }
+
+    pub fn from_id(
+        db: &PooledConnection<SqliteConnectionManager>,
+        id: i64,
+    ) -> Result<ModpackVersion<Saved>, Box<dyn Error>> {
+        let get_modpack_version = include_str!("../../../sql/modpack_versions/from_id.sql");
+
+        let mut stmt = db.prepare(get_modpack_version)?;
+        let modpack_version = stmt.query_row(params![id], |row| {
+            Ok(ModpackVersion {
+                id: Some(row.get(0)?),
+                modpack_id: row.get(1)?,
+                game_version: row.get(2)?,
+                installed: row.get(3)?,
+                loaded: row.get(4)?,
+                state: PhantomData::<Saved>,
+            })
+        })?;
+
+        Ok(modpack_version)
+    }
 }
 
 impl ModpackVersion<Saved> {
@@ -203,5 +226,28 @@ impl ModpackVersion<Saved> {
         }
 
         Ok(mod_versions)
+    }
+
+    pub fn delete(
+        self,
+        app_handle: tauri::AppHandle,
+        db: &mut Connection,
+    ) -> Result<(), Box<dyn Error>> {
+        let delete_modpack_version = include_str!("../../../sql/modpack_versions/delete.sql");
+
+        let tx = db.transaction()?;
+
+        if self.loaded {
+            ModpackVersion::unload_all(&tx)?;
+        }
+
+        tx.execute(delete_modpack_version, params![self.id])?;
+
+        // Remove the modpack version directory
+        self.uninstall(&app_handle)?;
+
+        tx.commit()?;
+
+        Ok(())
     }
 }

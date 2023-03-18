@@ -46,3 +46,9 @@ export async function unload() {
 		return joins;
 	});
 }
+
+export async function remove(versionId: number) {
+	modpackJoins.update((joins) => {
+		return joins.filter((join) => join.id !== versionId);
+	});
+}

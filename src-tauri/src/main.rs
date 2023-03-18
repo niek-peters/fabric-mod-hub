@@ -79,6 +79,7 @@ fn main() {
             get_mod_joins,
             load_modpack_version,
             unload_modpack_versions,
+            uninstall_modpack_version
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -159,6 +160,18 @@ fn load_modpack_version(
 fn unload_modpack_versions(db: tauri::State<'_, DbState>) -> Result<(), String> {
     let db = database::get_conn(db);
     ModpackVersion::unload_all(&db).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn uninstall_modpack_version(id: i64, app_handle: tauri::AppHandle, db: tauri::State<'_, DbState>) {
+    let mut db = database::get_conn(db);
+
+    let modpack_version = ModpackVersion::from_id(&db, id)
+        .expect(format!("Should get the modpack version related with id: {id}").as_str());
+
+    modpack_version
+        .delete(app_handle, &mut db)
+        .expect("Should delete modpack version");
 }
 
 #[tauri::command]

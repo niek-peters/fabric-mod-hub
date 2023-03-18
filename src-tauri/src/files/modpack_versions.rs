@@ -40,6 +40,19 @@ impl ModpackVersion<Saved> {
         Ok(())
     }
 
+    pub fn uninstall(&self, app_handle: &tauri::AppHandle) -> Result<(), Box<dyn Error>> {
+        let id = self.id.expect("Saved ModpackVersion should have an id");
+
+        let mut path = super::get_data_path(app_handle);
+        let dir_name = format!("{}/", id);
+        path.push(dir_name);
+
+        fs::remove_dir_all(&path)
+            .expect(format!("Should remove ModpackVersion directory: {:?}", &path).as_str());
+
+        Ok(())
+    }
+
     pub fn is_installed(id: i64, app_handle: &tauri::AppHandle) -> bool {
         let mut path = super::get_data_path(app_handle);
         let dir_name = format!("{}/", id);

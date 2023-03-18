@@ -1,14 +1,30 @@
 <script lang="ts">
 	import { open } from '@tauri-apps/api/shell';
+	import { invoke } from '@tauri-apps/api/tauri';
 
 	import Fa from 'svelte-fa';
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 
 	import type { PageData } from './$types';
-	import { modpackJoins, loadFromVersionId, unload } from '$stores/modpackJoins';
+	import { modpackJoins, loadFromVersionId, unload, remove } from '$stores/modpackJoins';
+	import { goto } from '$app/navigation';
 	export let data: PageData;
 
 	$: modpackJoin = $modpackJoins.find((join) => join.id === data.id);
+
+	async function uninstall() {
+		if (!modpackJoin) return;
+
+		if (modpackJoin.loaded) {
+			unload();
+		}
+
+		await invoke('uninstall_modpack_version', { id: modpackJoin.id });
+
+		await remove(modpackJoin.id);
+
+		await goto('/');
+	}
 </script>
 
 {#if modpackJoin}
@@ -72,6 +88,7 @@
 					: 'bg-creeper/80 hover:bg-creeper/60'}">{modpackJoin.loaded ? 'Unload' : 'Load'}</button
 			>
 			<button
+				on:click={uninstall}
 				class="flex w-1/2 items-center justify-center px-4 py-2 bg-rose-800 rounded-md hover:bg-rose-900 transition duration-300"
 				>Uninstall</button
 			>
