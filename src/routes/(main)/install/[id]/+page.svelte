@@ -5,7 +5,7 @@
 	import { faCaretRight, faDownload } from '@fortawesome/free-solid-svg-icons';
 
 	import type { PageData } from './$types';
-	import { setModpackJoins } from '$src/lib/stores/modpackJoins';
+	import { setModpackJoins } from '$stores/modpackJoins';
 	export let data: PageData;
 
 	$: selected = '';
@@ -25,36 +25,38 @@
 <section class="flex flex-col h-full gap-4">
 	<h2 class="text-xl">{data.modpack.name}</h2>
 	<label class="text-zinc-300 text-lg" for="version">Select a Minecraft version</label>
-	<div class="list flex flex-col overflow-y-auto gap-2 bg-zinc-900/20 rounded-md p-2">
-		{#each data.game_versions as game_version}
-			<div
-				class="relative flex items-center w-full transition duration-300 rounded-md cursor-pointer {selected ===
-				game_version
-					? 'bg-zinc-700/50'
-					: 'hover:bg-zinc-700/30'}"
-			>
-				<label class="flex w-full gap-4 px-4 py-2 cursor-pointer" for={game_version}
-					>{game_version}</label
-				>
-				<Fa
-					class="absolute text-3xl shadow-2xl text-creeper transition-all duration-300 {selected ===
+	<div class="list overflow-y-auto -ml-4 pl-4 {data.game_versions.length > 9 ? 'pr-2' : ''}">
+		<div class="flex flex-col gap-2 bg-zinc-900/20 rounded-md p-2">
+			{#each data.game_versions as game_version}
+				<div
+					class="relative flex items-center w-full transition duration-300 rounded-md cursor-pointer {selected ===
 					game_version
-						? '-left-2 opacity-100'
-						: '-left-6 opacity-0'}"
-					icon={faCaretRight}
-				/>
-				<input
-					type="radio"
-					class="absolute opacity-0 w-full h-full cursor-pointer"
-					value={game_version}
-					id={game_version}
-					name="game_version"
-					on:input={() => {
-						selected = game_version;
-					}}
-				/>
-			</div>
-		{/each}
+						? 'bg-zinc-700/50'
+						: 'hover:bg-zinc-700/30'}"
+				>
+					<label class="flex w-full gap-4 px-4 py-2 cursor-pointer" for={game_version}
+						>{game_version}</label
+					>
+					<Fa
+						class="absolute text-3xl shadow-2xl text-creeper transition-all duration-300 {selected ===
+						game_version
+							? '-left-2 opacity-100'
+							: '-left-6 opacity-0'}"
+						icon={faCaretRight}
+					/>
+					<input
+						type="radio"
+						class="absolute opacity-0 w-full h-full cursor-pointer"
+						value={game_version}
+						id={game_version}
+						name="game_version"
+						on:input={() => {
+							selected = game_version;
+						}}
+					/>
+				</div>
+			{/each}
+		</div>
 	</div>
 	<div class="mt-auto flex flex-col gap-2">
 		{#if selected}

@@ -8,10 +8,12 @@
 	export let routeId: string = href;
 
 	import { page } from '$app/stores';
+	import { clearSearch } from '$stores/search';
 </script>
 
 <a
 	{href}
+	on:click={clearSearch}
 	class="flex items-center gap-4 py-2 px-4 rounded-md transition duration-300 {(routeId !==
 		'/(main)' &&
 		$page.route.id?.includes(routeId)) ||

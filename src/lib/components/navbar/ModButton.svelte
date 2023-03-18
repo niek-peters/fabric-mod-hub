@@ -8,8 +8,8 @@
 	export let version: string;
 	export let loaded: boolean = false;
 
-	let href = `/packs/${id}`;
-	let routeId = `/(main)/packs/${id}`;
+	$: href = `/packs/${id}`;
+	$: routeId = `/(main)/packs/${id}`;
 </script>
 
 <a
