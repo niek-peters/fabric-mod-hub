@@ -15,7 +15,7 @@
 </script>
 
 <div class="flex gap-4 h-full">
-	<div class="flex flex-col w-3/5 gap-4">
+	<div class="flex flex-col w-3/5 flex-shrink-0 gap-4">
 		<section class="flex flex-col gap-4">
 			<h1 class="text-xl">Pre-made modpacks</h1>
 			{#each premade as modpack}
@@ -44,7 +44,9 @@
 		</section>
 	</div>
 	<VerLine />
-	<Transition url={data.url}>
-		<slot />
-	</Transition>
+	<div class="flex flex-grow">
+		<Transition url={data.url}>
+			<slot />
+		</Transition>
+	</div>
 </div>

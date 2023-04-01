@@ -56,7 +56,7 @@ fn main() {
                     .expect("Should initialize settings");
 
                 // Initialize default modpacks
-                create_default_modpack_versions(&client, &mut db).await;
+                create_default_modpacks(&client, &mut db).await;
 
                 // After it's done, close the splashscreen and display the main window
                 splashscreen_window.close().unwrap();
@@ -80,7 +80,7 @@ fn main() {
         .expect("error while running tauri application");
 }
 
-async fn create_default_modpack_versions(
+async fn create_default_modpacks(
     client: &Client,
     db: &mut PooledConnection<SqliteConnectionManager>,
 ) {

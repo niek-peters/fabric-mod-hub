@@ -60,7 +60,9 @@
 	</div>
 	<div class="mt-auto flex flex-col gap-2">
 		{#if selected}
-			<p class="text-zinc-300 text-lg">Selected version: {selected}</p>
+			<p class="text-zinc-300 text-lg w-64 whitespace-nowrap overflow-hidden text-ellipsis">
+				Selected version: {selected}
+			</p>
 		{:else}
 			<p class="text-zinc-300 text-lg">Select a version to install</p>
 		{/if}

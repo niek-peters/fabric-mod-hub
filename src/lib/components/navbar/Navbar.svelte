@@ -10,6 +10,8 @@
 
 	export let modpacks: ModpackJoin[];
 
+	let searchEl: HTMLInputElement;
+
 	let typing = false;
 
 	$: filteredModpacks = modpacks
@@ -37,10 +39,13 @@
 		<NavButton icon={faHome} text="Home" href="/" routeId="/(main)" />
 		<Line />
 		<div class="flex flex-col gap-4">
-			<div
-				class="flex py-2 px-4 gap-4 rounded-full items-center transition duration-300 {typing
+			<button
+				class="flex py-2 px-4 gap-4 rounded-full items-center cursor-text transition duration-300 {typing
 					? 'bg-zinc-700'
 					: 'bg-zinc-700/50'}"
+				on:click={() => {
+					searchEl.focus();
+				}}
 			>
 				<Fa icon={faMagnifyingGlass} />
 				<input
@@ -50,8 +55,9 @@
 					on:focusin={() => (typing = true)}
 					on:focusout={() => (typing = false)}
 					bind:value={$search}
+					bind:this={searchEl}
 				/>
-			</div>
+			</button>
 			<section
 				class="modpacks flex flex-col gap-4 -ml-4 pl-4 overflow-y-auto {filteredModpacks.length > 5
 					? 'pr-2'

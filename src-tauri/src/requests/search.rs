@@ -5,7 +5,7 @@ use std::error::Error;
 
 pub async fn run(client: &Client, query: String) -> Result<Vec<Mod<NotSaved>>, Box<dyn Error>> {
     let res = client
-            .get(format!("​https://api.modrinth.com/v2/search?query={}&facets=[[\"categories:fabric\"],[\"project_type:mod\"]]", query))
+            .get(format!("https://api.modrinth.com/v2/search?query={}&facets=[[\"categories:fabric\"],[\"project_type:mod\"]]", query))
             .send()
             .await?;
 

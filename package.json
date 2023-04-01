@@ -23,6 +23,7 @@
 		"prettier-plugin-svelte": "^2.8.1",
 		"svelte": "^3.54.0",
 		"svelte-check": "^3.0.1",
+		"svelte-loading-spinners": "^0.3.4",
 		"tailwindcss": "^3.2.7",
 		"tslib": "^2.4.1",
 		"typescript": "^4.9.3",
@@ -34,6 +35,7 @@
 		"@fortawesome/free-regular-svg-icons": "^6.3.0",
 		"@fortawesome/free-solid-svg-icons": "^6.3.0",
 		"@tauri-apps/api": "^1.2.0",
-		"svelte-fa": "^3.0.3"
+		"svelte-fa": "^3.0.3",
+		"svelte-french-toast": "^1.0.4-beta.0"
 	}
 }
