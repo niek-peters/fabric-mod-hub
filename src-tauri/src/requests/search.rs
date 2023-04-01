@@ -1,21 +1,7 @@
-use std::error::Error;
-
-use reqwest::Client;
-use serde::{Deserialize, Serialize};
-
+use super::SearchResponse;
 use crate::database::models::{Mod, NotSaved};
-
-#[derive(Serialize, Deserialize)]
-struct SearchResponse {
-    hits: Vec<Hit>,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Hit {
-    project_id: String,
-    title: String,
-    slug: String,
-}
+use reqwest::Client;
+use std::error::Error;
 
 pub async fn run(client: &Client, query: String) -> Result<Vec<Mod<NotSaved>>, Box<dyn Error>> {
     let res = client

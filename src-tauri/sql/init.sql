@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS mod_versions (
 
 CREATE TABLE IF NOT EXISTS settings (
     id INTEGER PRIMARY KEY CHECK (id = 0) NOT NULL,
-    minecraft_dir VARCHAR(63) NOT NULL,
+    minecraft_dir VARCHAR(255) NOT NULL,
     stable_only BOOLEAN NOT NULL DEFAULT TRUE
 );
 COMMIT;

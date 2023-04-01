@@ -1,0 +1,1 @@
+SELECT minecraft_dir FROM settings WHERE id = 0;

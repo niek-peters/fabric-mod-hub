@@ -1,5 +1,4 @@
 use crate::database::models::{Modpack, Saved};
-
 use reqwest::Client;
 use std::error::Error;
 

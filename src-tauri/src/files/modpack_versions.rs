@@ -19,7 +19,7 @@ impl ModpackVersion<Saved> {
             return Ok(());
         }
 
-        let mod_versions = self.get_mod_versions(db)?;
+        let mod_versions = ModVersion::get_from_modpack_version(&self, db)?;
 
         let mut incl_dependencies: Vec<ModVersion<Saved>> = Vec::new();
         for mod_version in mod_versions {

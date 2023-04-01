@@ -1,18 +1,5 @@
-use derive_new::new;
+use super::ModpackJoin;
 use rusqlite::Connection;
-use serde::Serialize;
-
-#[derive(new, Serialize, Clone)]
-pub struct ModpackJoin {
-    pub id: i64,
-    pub modpack_id: i64,
-    pub name: String,
-    pub slug: String,
-    pub game_version: String,
-    pub premade: bool,
-    pub installed: bool,
-    pub loaded: bool,
-}
 
 impl ModpackJoin {
     pub fn get_all(db: &Connection) -> Vec<ModpackJoin> {

@@ -1,20 +1,6 @@
-use std::error::Error;
-
-use derive_new::new;
+use super::ModJoin;
 use rusqlite::Connection;
-use serde::Serialize;
-
-#[derive(new, Serialize, Debug, Clone)]
-pub struct ModJoin {
-    pub id: i64,
-    pub mod_id: i64,
-    pub version_id: String,
-    pub name: String,
-    pub slug: String,
-    pub game_version: String,
-    pub page_url: String,
-    pub download_url: String,
-}
+use std::error::Error;
 
 impl ModJoin {
     // pub fn get_all(db: &Connection) -> Vec<ModJoin> {
@@ -39,7 +25,7 @@ impl ModJoin {
     //     mod_joins_iter.map(|mod_join| mod_join.unwrap()).collect()
     // }
 
-    pub fn from_modpack_version_id(
+    pub fn get_by_modpack_version_id(
         db: &Connection,
         modpack_version_id: i64,
     ) -> Result<Vec<ModJoin>, Box<dyn Error>> {
