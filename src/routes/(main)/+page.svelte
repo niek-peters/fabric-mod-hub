@@ -1,20 +1,10 @@
 <script lang="ts">
 	import { open } from '@tauri-apps/api/shell';
-	import { invoke } from '@tauri-apps/api/tauri';
 
 	import Fa from 'svelte-fa';
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 	import { faGithub } from '@fortawesome/free-brands-svg-icons';
 	import { modpackJoins, unload } from '$stores/modpackJoins';
-
-	let debugMsg: any;
-	async function debug() {
-		try {
-			debugMsg = JSON.stringify(await invoke('test_request'));
-		} catch (e) {
-			debugMsg = e;
-		}
-	}
 
 	$: loadedModpack = $modpackJoins.find((join) => join.loaded);
 </script>
@@ -59,8 +49,7 @@
 			</div>
 		</article>
 	{/if}
-	<section class="flex mt-auto justify-between h-fit">
-		<button on:click={debug}>Debug msg: {debugMsg}</button>
+	<section class="flex mt-auto justify-end h-fit">
 		<button
 			class="flex gap-2 items-center hover:text-slate-300 transition duration-300"
 			on:click={() => open('https://github.com/MrValk/fabric-mod-hub')}

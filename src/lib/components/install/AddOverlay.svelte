@@ -170,6 +170,8 @@
 					</div>
 				</div>
 				<div
+					on:mouseenter={() => (helpHover = true)}
+					on:mouseleave={() => (helpHover = false)}
 					class="relative mt-auto flex items-center justify-center w-full py-2 text-indigo-400 hover:text-indigo-500 transition duration-300"
 				>
 					{#if helpHover}
@@ -186,9 +188,7 @@
 							/>
 						</span>
 					{/if}
-					<p on:mouseenter={() => (helpHover = true)} on:mouseleave={() => (helpHover = false)}>
-						Can't find a mod?
-					</p>
+					<p>Can't find a mod?</p>
 				</div>
 			</section>
 			<VerLine color="bg-zinc-600" />
@@ -302,7 +302,7 @@
 
 		/* Track */
 		&::-webkit-scrollbar-track {
-			background-color: rgb(63 63 70 / 0.5);
+			background-color: rgb(39 39 42 / 0.2);
 			border-radius: 0.375rem /* 6px */;
 		}
 
