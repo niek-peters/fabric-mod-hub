@@ -6,6 +6,9 @@
 	import VerLine from '$components/VerLine.svelte';
 	import Transition from '$components/install/Transition.svelte';
 	import ModButton from '$components/install/ModButton.svelte';
+	import AddOverlay from '$src/lib/components/install/AddOverlay.svelte';
+
+	import { adding, startAdding } from '$stores/addState';
 
 	import type { LayoutData } from './$types';
 	export let data: LayoutData;
@@ -14,7 +17,7 @@
 	const custom = data.modpacks.filter((modpack) => !modpack.premade);
 </script>
 
-<div class="flex gap-4 h-full">
+<div class="relative flex gap-4 h-full {$adding ? 'pointer-events-none' : ''}">
 	<div class="flex flex-col w-3/5 flex-shrink-0 gap-4">
 		<section class="flex flex-col gap-4">
 			<h1 class="text-xl">Pre-made modpacks</h1>
@@ -26,11 +29,11 @@
 		<section class="flex flex-col items-center gap-4">
 			<div class="flex justify-between w-full">
 				<h1 class="text-xl">Your modpacks</h1>
-				<a
-					href="/install/add"
+				<button
+					on:click|stopPropagation={startAdding}
 					class="flex gap-2 items-center bg-creeper/80 hover:bg-creeper/60 transition duration-300 px-2 py-1 rounded-md"
 					><Fa icon={faPlus} /> Add new
-				</a>
+				</button>
 			</div>
 			{#if custom.length}
 				{#each custom as modpack}
@@ -49,4 +52,7 @@
 			<slot />
 		</Transition>
 	</div>
+	{#if $adding}
+		<AddOverlay />
+	{/if}
 </div>

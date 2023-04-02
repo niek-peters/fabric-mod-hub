@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
 	import Fa from 'svelte-fa';
 	import { faGear, faHome, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,6 +15,10 @@
 	let searchEl: HTMLInputElement;
 
 	let typing = false;
+
+	onMount(() => {
+		searchEl.focus();
+	});
 
 	$: filteredModpacks = modpacks
 		.filter(

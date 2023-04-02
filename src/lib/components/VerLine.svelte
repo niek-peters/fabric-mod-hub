@@ -1,1 +1,5 @@
-<span class="w-px h-full bg-zinc-700 flex-shrink-0" />
+<script lang="ts">
+	export let color = 'bg-zinc-700';
+</script>
+
+<span class="w-px h-full {color} flex-shrink-0" />
