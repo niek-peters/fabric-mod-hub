@@ -1,9 +1,9 @@
 import type { PageLoad } from './$types';
 import { invoke } from '@tauri-apps/api/tauri';
 
-export const load: PageLoad = async ({ params, parent }) => {
+export const load: PageLoad = async ({ params }) => {
 	const id = parseInt(params.id);
-	const modpack = (await parent()).modpacks.filter((modpack) => modpack.id === id)[0];
+	const modpack = (await invoke('get_modpack', { id })) as Modpack;
 
 	const res = await invoke('get_modpack_game_versions', { id });
 

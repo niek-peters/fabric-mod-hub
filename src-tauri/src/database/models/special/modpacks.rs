@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use reqwest::Client;
-use rusqlite::Connection;
+use rusqlite::{params, Connection};
 
 use crate::database::models::{Mod, Modpack, Saved};
 
@@ -20,5 +20,14 @@ impl Modpack {
         }
 
         Modpack::new(name, slug, premade, mods).save(db)
+    }
+
+    pub fn slug_exists(db: &Connection, slug: &str) -> Result<bool, Box<dyn Error>> {
+        let slug_exists = include_str!("../../../../sql/modpacks/get_from_slug.sql");
+
+        let mut stmt = db.prepare(slug_exists)?;
+        let exists = stmt.exists(params![slug])?;
+
+        Ok(exists)
     }
 }

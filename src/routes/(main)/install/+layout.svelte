@@ -5,8 +5,8 @@
 	import Line from '$components/Line.svelte';
 	import VerLine from '$components/VerLine.svelte';
 	import Transition from '$components/install/Transition.svelte';
-	import ModButton from '$components/install/ModButton.svelte';
-	import AddOverlay from '$src/lib/components/install/AddOverlay.svelte';
+	import ModpackButton from '$components/install/ModpackButton.svelte';
+	import AddOverlay from '$components/install/AddOverlay.svelte';
 
 	import { adding, startAdding } from '$stores/addState';
 
@@ -14,19 +14,30 @@
 	export let data: LayoutData;
 
 	const premade = data.modpacks.filter((modpack) => modpack.premade);
-	const custom = data.modpacks.filter((modpack) => !modpack.premade);
+	let custom = data.modpacks.filter((modpack) => !modpack.premade);
+
+	function addCustom(newModpack: Modpack) {
+		custom.push(newModpack);
+		custom = custom;
+	}
+
+	function deleteCustom(id: number) {
+		custom = custom.filter((modpack) => modpack.id !== id);
+	}
 </script>
 
 <div class="relative flex gap-4 h-full {$adding ? 'pointer-events-none' : ''}">
 	<div class="flex flex-col w-3/5 flex-shrink-0 gap-4">
 		<section class="flex flex-col gap-4">
 			<h1 class="text-xl">Pre-made modpacks</h1>
-			{#each premade as modpack}
-				<ModButton id={modpack.id} name={modpack.name} />
-			{/each}
+			<div class="premades flex flex-col gap-4 overflow-y-auto {premade.length > 3 ? 'pr-2' : ''}">
+				{#each premade as modpack}
+					<ModpackButton id={modpack.id} name={modpack.name} />
+				{/each}
+			</div>
 		</section>
 		<Line />
-		<section class="flex flex-col items-center gap-4">
+		<section class="flex flex-col gap-4">
 			<div class="flex justify-between w-full">
 				<h1 class="text-xl">Your modpacks</h1>
 				<button
@@ -35,15 +46,24 @@
 					><Fa icon={faPlus} /> Add new
 				</button>
 			</div>
-			{#if custom.length}
-				{#each custom as modpack}
-					<ModButton id={modpack.id} name={modpack.name} />
-				{/each}
-			{:else}
-				<p class="flex items-center text-zinc-300 text-center text-lg w-4/5 h-24">
-					It seems like you haven't created any modpacks yet
-				</p>
-			{/if}
+			<div class="customs flex flex-col gap-4 overflow-y-auto {custom.length > 4 ? 'pr-2' : ''}">
+				{#if custom.length}
+					{#each custom as modpack}
+						<ModpackButton
+							id={modpack.id}
+							name={modpack.name}
+							premade={false}
+							deleteFunction={deleteCustom}
+						/>
+					{/each}
+				{:else}
+					<div class="w-full h-24 flex items-center justify-center">
+						<p class="text-center text-zinc-300 text-lg w-4/5">
+							It seems like you haven't created any modpacks yet
+						</p>
+					</div>
+				{/if}
+			</div>
 		</section>
 	</div>
 	<VerLine />
@@ -53,6 +73,40 @@
 		</Transition>
 	</div>
 	{#if $adding}
-		<AddOverlay />
+		<AddOverlay updateList={addCustom} />
 	{/if}
 </div>
+
+<style lang="scss">
+	.premades,
+	.customs {
+		&::-webkit-scrollbar {
+			width: 0.5rem;
+		}
+
+		/* Track */
+		&::-webkit-scrollbar-track {
+			background-color: rgb(63 63 70 / 0.5);
+			border-radius: 0.375rem /* 6px */;
+		}
+
+		/* Handle */
+		&::-webkit-scrollbar-thumb {
+			background-color: rgb(82 82 91 / 0.7);
+			transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+			border-radius: 0.375rem /* 6px */;
+
+			&:hover {
+				background-color: rgb(82 82 91 / 1);
+			}
+		}
+	}
+
+	.premades {
+		height: 12.5rem;
+	}
+
+	.customs {
+		height: 19.45rem;
+	}
+</style>

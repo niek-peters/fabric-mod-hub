@@ -1,0 +1,1 @@
+SELECT * FROM modpacks WHERE slug = $1;

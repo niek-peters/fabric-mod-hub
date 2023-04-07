@@ -11,7 +11,7 @@
 	$: selected = '';
 
 	async function install() {
-		await invoke('install_modpack', { id: data.id, gameVersion: selected });
+		await invoke('install_modpack_version', { id: data.id, gameVersion: selected });
 
 		const res = await invoke('get_all_modpack_joins');
 

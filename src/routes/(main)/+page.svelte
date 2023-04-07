@@ -16,9 +16,9 @@
 		<h1 class="absolute text-5xl text-center text-shadow z-30">Welcome to Fabric Mod Hub</h1>
 	</section>
 	{#if loadedModpack}
-		<article class="flex flex-col gap-4 w-full h-fit">
+		<article class="flex flex-col gap-4 w-full">
 			<h2 class="text-xl">Currently loaded modpack</h2>
-			<div class="flex gap-4">
+			<div class="flex gap-4 h-24">
 				<section class="flex flex-col gap-4 bg-zinc-700/20 p-4 rounded-md flex-grow shadow-2xl">
 					<div class="flex justify-between">
 						<h3 class="text-2xl">{loadedModpack.name}</h3>

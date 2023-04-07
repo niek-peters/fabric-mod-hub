@@ -25,6 +25,8 @@
 	} from '$stores/addState';
 	import VerLine from '../VerLine.svelte';
 
+	export let updateList: (newModpack: Modpack) => void;
+
 	let searchEl: HTMLInputElement;
 	let formEl: HTMLFormElement;
 
@@ -39,6 +41,7 @@
 	let helpHover = false;
 
 	let name: string;
+
 	let noMods = false;
 	$: {
 		if ($addState.mods.length) noMods = false;
@@ -62,6 +65,22 @@
 		if (Array.isArray(res)) {
 			results = res;
 		}
+	}
+
+	async function submit() {
+		const slug_exists = await invoke('check_slug_exists', { slug: $addState.modpack.slug });
+		if (slug_exists) return;
+
+		const modpack = (await invoke('add_modpack', {
+			name: $addState.modpack.name,
+			slug: $addState.modpack.slug,
+			projectIds: $addState.mods.map((mod) => mod.project_id)
+		})) as Modpack;
+
+		updateList(modpack);
+
+		resetAddState();
+		stopAdding();
 	}
 </script>
 
@@ -194,9 +213,11 @@
 			<VerLine color="bg-zinc-600" />
 			<form
 				class="flex flex-col flex-grow gap-4 h-full w-1/2"
-				on:submit|preventDefault={() => {
+				on:submit|preventDefault={async () => {
 					if (!$addState.mods.length && !noMods) noMods = true;
-					else formEl.submit();
+					else {
+						await submit();
+					}
 				}}
 				bind:this={formEl}
 			>

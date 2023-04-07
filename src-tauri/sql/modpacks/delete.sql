@@ -1,0 +1,1 @@
+DELETE FROM modpacks WHERE id = $1;

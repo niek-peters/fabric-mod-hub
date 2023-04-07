@@ -90,3 +90,13 @@ impl Modpack<NotSaved> {
         })
     }
 }
+
+impl Modpack<Saved> {
+    pub fn delete(self, db: &mut Connection) -> Result<(), Box<dyn Error>> {
+        let delete_modpack = include_str!("../../../../sql/modpacks/delete.sql");
+
+        db.execute(delete_modpack, params![self.id.unwrap()])?;
+
+        Ok(())
+    }
+}

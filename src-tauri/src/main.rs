@@ -66,14 +66,18 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            commands::get_modpack,
             commands::get_all_modpacks,
             commands::get_all_modpack_joins,
             commands::get_modpack_game_versions,
-            commands::install_modpack,
+            commands::check_slug_exists,
+            commands::add_modpack,
+            commands::delete_modpack,
             commands::get_mod_joins,
+            commands::install_modpack_version,
+            commands::uninstall_modpack_version,
             commands::load_modpack_version,
             commands::unload_modpack_versions,
-            commands::uninstall_modpack_version,
             commands::search
         ])
         .run(tauri::generate_context!())
