@@ -3,10 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use database::{
-    models::{Modpack, Settings},
-    Database,
-};
+use database::{models::Modpack, Database};
 use dotenvy::dotenv;
 use r2d2::PooledConnection;
 use r2d2_sqlite::SqliteConnectionManager;

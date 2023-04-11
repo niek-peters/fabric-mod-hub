@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { open } from '@tauri-apps/api/dialog';
-	import { readDir } from '@tauri-apps/api/fs';
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { onMount } from 'svelte';
 
@@ -10,8 +9,10 @@
 
 	import Line from '$components/Line.svelte';
 
+	import { foundMcDir, setFoundMcDir } from '$stores/foundMcDir';
+	import { unload } from '$stores/modpackJoins';
+
 	import type { PageData } from './$types';
-	import { foundMcDir, setFoundMcDir } from '$src/lib/stores/foundMcDir';
 	export let data: PageData;
 
 	let allowUnstableEl: HTMLInputElement;
@@ -21,16 +22,6 @@
 		allowUnstableEl.checked = data.settings.allow_unstable;
 		allowSnapshotsEl.checked = data.settings.allow_snapshots;
 	});
-
-	// List of folders that should be in the minecraft directory
-	const minecraftFolderContents = [
-		'assets',
-		'libraries',
-		'logs',
-		'versions',
-		'options.txt',
-		'launcher_profiles.json'
-	];
 
 	async function pickFolder() {
 		const selected = await open({
@@ -52,6 +43,8 @@
 	}
 
 	async function setMinecraftDir(dir: string) {
+		unload();
+
 		await invoke('set_minecraft_dir', {
 			minecraftDir: dir
 		});
