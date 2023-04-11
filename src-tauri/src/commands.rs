@@ -46,6 +46,16 @@ pub async fn get_modpack_game_versions(
         game_versions.retain(|v| !v.contains("w") && !v.contains("pre") && !v.contains("rc"));
     }
 
+    // Filter out versions that are already installed
+    let installed_versions = ModpackVersion::get_by_modpack_id(&db, id)
+        .expect(
+            format!("Should get all modpack versions related to modpack with id: {id}").as_str(),
+        )
+        .into_iter()
+        .map(|v| v.game_version)
+        .collect::<Vec<String>>();
+    game_versions.retain(|v| !installed_versions.contains(v));
+
     Ok(game_versions)
 }
 

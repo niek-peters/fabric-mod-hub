@@ -10,6 +10,7 @@
 	export let data: PageData;
 
 	$: selected = '';
+	$: console.log(selected);
 
 	async function install() {
 		await invoke('install_modpack_version', { id: data.id, gameVersion: selected });
@@ -20,6 +21,10 @@
 		if (Array.isArray(res)) {
 			setModpackJoins(res);
 		}
+
+		data.game_versions = data.game_versions.filter((version) => version !== selected);
+		(document.getElementById(selected) as HTMLInputElement).checked = false;
+		selected = '';
 	}
 </script>
 

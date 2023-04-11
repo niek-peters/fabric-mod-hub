@@ -1,4 +1,4 @@
-use std::{error::Error, fs, path::Path};
+use std::{error::Error, fs, marker::PhantomData, path::Path};
 
 use reqwest::Client;
 use rusqlite::{params, Connection};
@@ -9,6 +9,33 @@ use crate::{
 };
 
 impl ModpackVersion {
+    pub fn get_by_modpack_id(
+        db: &Connection,
+        modpack_id: i64,
+    ) -> Result<Vec<ModpackVersion<Saved>>, Box<dyn Error>> {
+        let get_by_modpack_id =
+            include_str!("../../../../sql/modpack_versions/get_by_modpack_id.sql");
+
+        let mut stmt = db.prepare(get_by_modpack_id)?;
+        let rows = stmt.query_map(params![modpack_id], |row| {
+            Ok(ModpackVersion {
+                id: row.get(0)?,
+                modpack_id: row.get(1)?,
+                game_version: row.get(2)?,
+                installed: row.get(3)?,
+                loaded: row.get(4)?,
+                state: PhantomData::<Saved>,
+            })
+        })?;
+
+        let mut modpack_versions = Vec::new();
+        for row in rows {
+            modpack_versions.push(row?);
+        }
+
+        Ok(modpack_versions)
+    }
+
     pub async fn create_from_modpack(
         modpack: Modpack<Saved>,
         client: &Client,
