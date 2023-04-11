@@ -42,7 +42,7 @@
 </script>
 
 <nav
-	class="flex flex-col w-fit h-full bg-zinc-700/30 p-4 mc-dir {!$foundMcDir
+	class="nav flex flex-col h-full bg-zinc-700/30 p-4 mc-dir {!$foundMcDir
 		? 'no-mc-dir pointer-events-none'
 		: 'pointer-events-auto'}"
 >
@@ -85,6 +85,10 @@
 							/>
 						{/if}
 					{/each}
+				{:else if !modpacks.length}
+					<p class="text-center mt-2 text-slate-300">Install a modpack using the button below</p>
+				{:else}
+					<p class="text-center mt-2 text-slate-300">No modpacks found</p>
 				{/if}
 			</section>
 		</div>
@@ -99,6 +103,10 @@
 </nav>
 
 <style lang="scss">
+	.nav {
+		width: 18.55rem;
+	}
+
 	.mc-dir {
 		filter: blur(0px);
 		transition: filter 300ms cubic-bezier(0.4, 0, 0.2, 1);
