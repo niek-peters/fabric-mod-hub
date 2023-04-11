@@ -67,12 +67,14 @@ pub struct ModpackVersion<State = NotSaved> {
     state: PhantomData<State>,
 }
 
-#[derive(new)]
+#[derive(new, Serialize)]
 pub struct Settings<State = NotSaved> {
     #[new(value = "0")]
     pub id: i64,
     pub minecraft_dir: String,
-    #[new(value = "true")]
-    pub stable_only: bool,
+    #[new(value = "false")]
+    pub allow_unstable: bool,
+    #[new(value = "false")]
+    pub allow_snapshots: bool,
     state: PhantomData<State>,
 }

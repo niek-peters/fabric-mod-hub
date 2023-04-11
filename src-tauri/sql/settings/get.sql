@@ -1,0 +1,1 @@
+SELECT id, minecraft_dir, allow_unstable, allow_snapshots FROM settings WHERE id = 0;

@@ -1,5 +1,5 @@
 <script>
-	import '$src/app.css';
+	import '$src/app.scss';
 	import { onMount } from 'svelte';
 
 	onMount(() => {

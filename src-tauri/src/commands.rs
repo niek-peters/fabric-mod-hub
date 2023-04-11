@@ -1,9 +1,12 @@
+use std::path::PathBuf;
+
 use crate::{
     database::{
         self,
         joins::{ModJoin, ModpackJoin},
         models::{Mod, Modpack, ModpackVersion, NotSaved, Saved, Settings},
     },
+    files,
     requests::search,
     DbState, ReqState,
 };
@@ -42,7 +45,7 @@ pub async fn get_modpack_game_versions(
         .await
         .map_err(|e| e.to_string())?;
 
-    if Settings::get_stable_only(&db).map_err(|e| e.to_string())? {
+    if !Settings::get_allow_snapshots(&db).map_err(|e| e.to_string())? {
         game_versions.retain(|v| !v.contains("w") && !v.contains("pre") && !v.contains("rc"));
     }
 
@@ -163,4 +166,68 @@ pub async fn search(
     search::run(&client.0, query)
         .await
         .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn init_settings(db: tauri::State<'_, DbState>) -> Result<(), String> {
+    let db = database::get_conn(db);
+
+    let mut failed = false;
+
+    // Initialize settings
+    let mc_dir = match files::get_minecraft_path() {
+        Ok(path) => path.to_str().unwrap().to_string(),
+        Err(_) => {
+            failed = true;
+            "".to_string()
+        }
+    };
+
+    Settings::new(mc_dir)
+        .save(&db)
+        .expect("Should initialize settings");
+
+    if failed {
+        Err("Failed to get Minecraft path".to_string())
+    } else {
+        Ok(())
+    }
+}
+
+#[tauri::command]
+pub fn get_settings(db: tauri::State<'_, DbState>) -> Result<Settings<Saved>, String> {
+    let db = database::get_conn(db);
+    Settings::get(&db).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn set_allow_unstable(
+    allow_unstable: bool,
+    db: tauri::State<'_, DbState>,
+) -> Result<(), String> {
+    let mut db = database::get_conn(db);
+    Settings::set_allow_unstable(&mut db, allow_unstable).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn set_allow_snapshots(
+    allow_snapshots: bool,
+    db: tauri::State<'_, DbState>,
+) -> Result<(), String> {
+    let mut db = database::get_conn(db);
+    Settings::set_allow_snapshots(&mut db, allow_snapshots).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn set_minecraft_dir(
+    minecraft_dir: String,
+    db: tauri::State<'_, DbState>,
+) -> Result<(), String> {
+    let mut db = database::get_conn(db);
+
+    let minecraft_dir = PathBuf::from(minecraft_dir);
+    match files::is_minecraft_dir(&minecraft_dir) {
+        true => Settings::set_minecraft_dir(&mut db, minecraft_dir).map_err(|e| e.to_string()),
+        false => Err("Not a valid Minecraft directory".to_string()),
+    }
 }

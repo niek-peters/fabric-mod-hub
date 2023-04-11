@@ -1,0 +1,1 @@
+UPDATE settings SET minecraft_dir = ?1 WHERE id = 0;

@@ -53,6 +53,13 @@ declare global {
 		premade: boolean;
 	};
 
+	type Settings = {
+		id: number;
+		minecraft_dir: string;
+		allow_unstable: boolean;
+		allow_snapshots: boolean;
+	};
+
 	namespace App {
 		// interface Error {}
 		// interface Locals {}

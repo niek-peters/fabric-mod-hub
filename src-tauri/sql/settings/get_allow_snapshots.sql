@@ -1,0 +1,1 @@
+SELECT allow_snapshots FROM settings WHERE id = 0;

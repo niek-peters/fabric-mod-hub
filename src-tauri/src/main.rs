@@ -45,16 +45,6 @@ fn main() {
 
             // we perform the initialization code on a new task so the app doesn't freeze
             tauri::async_runtime::spawn(async move {
-                // Initialize settings
-                let mc_dir = files::get_mc_path()
-                    .to_str()
-                    .expect("Should get mc path")
-                    .to_owned();
-
-                Settings::new(mc_dir)
-                    .save(&db)
-                    .expect("Should initialize settings");
-
                 // Initialize default modpacks
                 create_default_modpacks(&client, &mut db).await;
 
@@ -78,7 +68,12 @@ fn main() {
             commands::uninstall_modpack_version,
             commands::load_modpack_version,
             commands::unload_modpack_versions,
-            commands::search
+            commands::search,
+            commands::init_settings,
+            commands::get_settings,
+            commands::set_allow_unstable,
+            commands::set_allow_snapshots,
+            commands::set_minecraft_dir
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -13,8 +13,6 @@ export const load: PageLoad = async ({ params }) => {
 		mods = res;
 	}
 
-	console.log('blyat');
-
 	return {
 		id,
 		mods

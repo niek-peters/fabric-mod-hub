@@ -9,6 +9,7 @@
 	import ModButton from '$components/navbar/ModButton.svelte';
 
 	import { search } from '$stores/search';
+	import { foundMcDir } from '$src/lib/stores/foundMcDir';
 
 	export let modpacks: ModpackJoin[];
 
@@ -40,7 +41,11 @@
 	}
 </script>
 
-<nav class="flex flex-col w-fit h-full bg-zinc-700/30 p-4">
+<nav
+	class="flex flex-col w-fit h-full bg-zinc-700/30 p-4 mc-dir {!$foundMcDir
+		? 'no-mc-dir pointer-events-none'
+		: 'pointer-events-auto'}"
+>
 	<section class="flex flex-col gap-6">
 		<NavButton icon={faHome} text="Home" href="/" routeId="/(main)" />
 		<Line />
@@ -94,6 +99,15 @@
 </nav>
 
 <style lang="scss">
+	.mc-dir {
+		filter: blur(0px);
+		transition: filter 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+		&.no-mc-dir {
+			filter: blur(2px);
+		}
+	}
+
 	.modpacks {
 		height: 16.5rem;
 

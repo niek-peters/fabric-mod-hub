@@ -3,7 +3,7 @@
 	import { WebviewWindow } from '@tauri-apps/api/window';
 	import { onMount } from 'svelte';
 
-	import { Toaster } from 'svelte-french-toast';
+	import toast, { Toaster } from 'svelte-french-toast';
 
 	import Titlebar from '$components/Titlebar.svelte';
 	import Transition from '$components/Transition.svelte';
@@ -13,12 +13,27 @@
 	import { onVisible } from '$utils/onVisible';
 
 	import type { LayoutData } from '../$types';
+	import { setFoundMcDir } from '$src/lib/stores/foundMcDir';
+	import { goto } from '$app/navigation';
 	export let data: LayoutData;
 
-	onMount(() => {
+	onMount(async () => {
 		let window = WebviewWindow.getByLabel('main');
 
-		if (window) onVisible(window, getModpackJoins);
+		if (window) {
+			try {
+				await invoke('init_settings');
+			} catch (_e) {
+				toast('Please pick your Minecraft folder', {
+					icon: '👇',
+					style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
+				});
+				setFoundMcDir(false);
+				goto('/settings');
+			}
+
+			onVisible(window, getModpackJoins);
+		}
 	});
 
 	async function getModpackJoins() {

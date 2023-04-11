@@ -23,6 +23,12 @@
 				"show": true,
 				"minimize": true,
 				"startDragging": true
+			},
+			"dialog": {
+				"open": true
+			},
+			"fs": {
+				"readDir": true
 			}
 		},
 		"bundle": {

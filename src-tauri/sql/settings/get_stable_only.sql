@@ -1,1 +1,0 @@
-SELECT stable_only FROM settings WHERE id = 0;

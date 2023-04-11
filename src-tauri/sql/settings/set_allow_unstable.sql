@@ -1,0 +1,1 @@
+UPDATE settings SET allow_unstable = ?1 WHERE id = 0;

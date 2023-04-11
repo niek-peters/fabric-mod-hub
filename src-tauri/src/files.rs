@@ -7,6 +7,15 @@ use std::{
     path::PathBuf,
 };
 
+const MINECRAFT_FOLDER_CONTENTS: [&str; 6] = [
+    "assets",
+    "libraries",
+    "logs",
+    "versions",
+    "options.txt",
+    "launcher_profiles.json",
+];
+
 pub fn get_data_path(app_handle: &tauri::AppHandle) -> PathBuf {
     let data_dir: PathBuf;
 
@@ -25,7 +34,7 @@ pub fn get_data_path(app_handle: &tauri::AppHandle) -> PathBuf {
     data_dir
 }
 
-pub fn get_mc_path() -> PathBuf {
+pub fn get_minecraft_path() -> Result<PathBuf, String> {
     if is_dev() {
         let mut dir = PathBuf::from("data/.minecraft/");
 
@@ -43,10 +52,10 @@ pub fn get_mc_path() -> PathBuf {
 
         dir.pop();
 
-        return dir;
+        return Ok(dir);
     }
 
-    match OS {
+    let mc_path = match OS {
         "windows" => {
             let mut dir = dirs::config_dir().expect("Should get %APPDATA% dir");
             dir.push(".minecraft");
@@ -63,7 +72,27 @@ pub fn get_mc_path() -> PathBuf {
             dir
         }
         _ => panic!("Unsupported OS"),
+    };
+
+    if !is_minecraft_dir(&mc_path) {
+        return Err("Directory is not a Minecraft directory".to_string());
     }
+
+    Ok(mc_path)
+}
+
+pub fn is_minecraft_dir(dir: &PathBuf) -> bool {
+    if !dir.is_dir() {
+        return false;
+    }
+
+    for file in MINECRAFT_FOLDER_CONTENTS.iter() {
+        if !dir.join(file).exists() {
+            return false;
+        }
+    }
+
+    true
 }
 
 pub fn is_dev() -> bool {

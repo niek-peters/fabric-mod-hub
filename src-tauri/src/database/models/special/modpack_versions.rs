@@ -74,7 +74,7 @@ impl ModpackVersion {
         version_dir.push(dir_name);
 
         // Get the minecraft mods directory
-        let mut mods_dir = Settings::get_mc_dir(&tx)?;
+        let mut mods_dir = Settings::get_minecraft_dir(&tx)?;
         mods_dir.push("mods");
 
         // Create the original_mods directory
@@ -127,7 +127,7 @@ impl ModpackVersion {
         db.execute(unload_all_modpack_versions, [])?;
 
         // Get the minecraft mods directory
-        let mut mods_dir = Settings::get_mc_dir(&db)?;
+        let mut mods_dir = Settings::get_minecraft_dir(&db)?;
         mods_dir.push("mods");
 
         // Get the original_mods directory
