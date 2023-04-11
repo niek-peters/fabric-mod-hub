@@ -18,7 +18,7 @@
 	{#if loadedModpack}
 		<article class="flex flex-col gap-4 w-full">
 			<h2 class="text-xl">Currently loaded modpack</h2>
-			<div class="flex gap-4 h-24">
+			<div class="flex gap-4">
 				<section class="flex flex-col gap-4 bg-zinc-700/20 p-4 rounded-md flex-grow shadow-2xl">
 					<div class="flex justify-between">
 						<h3 class="text-2xl">{loadedModpack.name}</h3>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
 	import { faPlus } from '@fortawesome/free-solid-svg-icons';
+	import toast from 'svelte-french-toast';
 
 	import Line from '$components/Line.svelte';
 	import VerLine from '$components/VerLine.svelte';
@@ -23,6 +24,11 @@
 
 	function deleteCustom(id: number) {
 		custom = custom.filter((modpack) => modpack.id !== id);
+
+		toast('Deleted modpack', {
+			icon: '🗑️',
+			style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
+		});
 	}
 </script>
 

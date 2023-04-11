@@ -3,6 +3,7 @@
 
 	import Fa from 'svelte-fa';
 	import { faCaretRight, faDownload } from '@fortawesome/free-solid-svg-icons';
+	import toast from 'svelte-french-toast';
 
 	import type { PageData } from './$types';
 	import { setModpackJoins } from '$stores/modpackJoins';
@@ -67,7 +68,19 @@
 			<p class="text-zinc-300 text-lg">Select a version to install</p>
 		{/if}
 		<button
-			on:click={install}
+			on:click={() => {
+				toast.promise(
+					install(),
+					{
+						loading: 'Installing modpack',
+						success: 'Installed modpack',
+						error: 'Failed to install modpack'
+					},
+					{
+						style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
+					}
+				);
+			}}
 			disabled={!selected}
 			class="flex items-center justify-center px-4 py-2 rounded-md gap-2 text-lg  transition duration-300 {selected
 				? 'hover:bg-creeper/60 bg-creeper/80 transition duration-300'

@@ -4,6 +4,7 @@
 
 	import Fa from 'svelte-fa';
 	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+	import toast from 'svelte-french-toast';
 
 	import type { PageData } from './$types';
 	import { modpackJoins, loadFromVersionId, unload, remove } from '$stores/modpackJoins';
@@ -22,6 +23,10 @@
 		await invoke('uninstall_modpack_version', { id: modpackJoin.id });
 
 		await remove(modpackJoin.id);
+
+		toast.success('Uninstalled modpack', {
+			style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
+		});
 
 		await goto('/');
 	}

@@ -13,6 +13,7 @@
 		faUpRightFromSquare,
 		faPlus
 	} from '@fortawesome/free-solid-svg-icons';
+	import toast, { Toaster } from 'svelte-french-toast';
 
 	import {
 		adding,
@@ -46,6 +47,7 @@
 	$: {
 		if ($addState.mods.length) noMods = false;
 	}
+	let showNoMods = false;
 
 	onMount(() => {
 		searchEl.focus();
@@ -68,9 +70,6 @@
 	}
 
 	async function submit() {
-		const slug_exists = await invoke('check_slug_exists', { slug: $addState.modpack.slug });
-		if (slug_exists) return;
-
 		const modpack = (await invoke('add_modpack', {
 			name: $addState.modpack.name,
 			slug: $addState.modpack.slug,
@@ -215,8 +214,22 @@
 				class="flex flex-col flex-grow gap-4 h-full w-1/2"
 				on:submit|preventDefault={async () => {
 					if (!$addState.mods.length && !noMods) noMods = true;
-					else {
-						await submit();
+					else if (await invoke('check_slug_exists', { slug: $addState.modpack.slug })) {
+						toast.error('Modpack name was taken', {
+							style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
+						});
+					} else {
+						toast.promise(
+							submit(),
+							{
+								loading: 'Creating modpack...',
+								success: 'Modpack added!',
+								error: 'Failed to create modpack'
+							},
+							{
+								style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
+							}
+						);
 					}
 				}}
 				bind:this={formEl}
@@ -280,7 +293,7 @@
 					</div>
 				</div>
 				<div class="relative w-full">
-					{#if noMods}
+					{#if noMods && showNoMods}
 						<span
 							in:fly={{ y: 20, duration: 250 }}
 							out:fly={{ y: 20, duration: 250 }}
@@ -296,6 +309,8 @@
 						</span>
 					{/if}
 					<button
+						on:mouseenter={() => (showNoMods = true)}
+						on:mouseleave={() => (showNoMods = false)}
 						type="submit"
 						class="flex items-center justify-center w-full gap-2 px-4 py-2 rounded-md transition duration-300 {noMods
 							? 'bg-rose-800 hover:bg-rose-900'

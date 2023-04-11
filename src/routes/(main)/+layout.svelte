@@ -3,6 +3,8 @@
 	import { WebviewWindow } from '@tauri-apps/api/window';
 	import { onMount } from 'svelte';
 
+	import { Toaster } from 'svelte-french-toast';
+
 	import Titlebar from '$components/Titlebar.svelte';
 	import Transition from '$components/Transition.svelte';
 	import Navbar from '$components/navbar/Navbar.svelte';
@@ -29,8 +31,10 @@
 	}
 </script>
 
+<Toaster containerStyle="margin-top: 2rem; z-index: 40;" />
+
 <Titlebar />
-<div class="flex mt-8 w-screen bg-zinc-800 text-slate-50 select-none">
+<div class="window flex relative mt-8 w-screen bg-zinc-800 text-slate-50 select-none">
 	<Navbar modpacks={$modpackJoins} />
 	<Transition url={data.url}>
 		<slot />
