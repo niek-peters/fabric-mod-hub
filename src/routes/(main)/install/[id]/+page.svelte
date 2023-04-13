@@ -10,7 +10,6 @@
 	export let data: PageData;
 
 	$: selected = '';
-	$: console.log(selected);
 
 	async function install() {
 		await invoke('install_modpack_version', { id: data.id, gameVersion: selected });
@@ -29,7 +28,9 @@
 </script>
 
 <section class="flex flex-col h-full gap-4">
-	<h2 class="text-xl">{data.modpack.name}</h2>
+	<h2 class="title text-xl whitespace-nowrap overflow-hidden text-ellipsis">
+		{data.modpack.name}
+	</h2>
 	<label class="text-zinc-300 text-lg" for="version">Select a Minecraft version</label>
 	<div class="list overflow-y-auto -ml-4 pl-4 {data.game_versions.length > 9 ? 'pr-2' : ''}">
 		<div class="flex flex-col gap-2 bg-zinc-900/20 rounded-md p-2">
@@ -96,6 +97,10 @@
 </section>
 
 <style lang="scss">
+	.title {
+		width: 17rem;
+	}
+
 	.list {
 		max-height: 28rem;
 

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+
 	import Fa from 'svelte-fa';
 	import { faPlus } from '@fortawesome/free-solid-svg-icons';
 	import toast from 'svelte-french-toast';
@@ -29,6 +32,8 @@
 			icon: '🗑️',
 			style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
 		});
+
+		if ($page.params.id === id.toString()) goto('/install');
 	}
 </script>
 

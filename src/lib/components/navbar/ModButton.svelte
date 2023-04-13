@@ -19,7 +19,7 @@
 		? 'bg-zinc-600/80'
 		: 'bg-zinc-700/50 hover:bg-zinc-700'}"
 >
-	<p class="w-32 whitespace-nowrap overflow-hidden text-ellipsis">{name}</p>
+	<p class="w-40 whitespace-nowrap overflow-hidden text-ellipsis">{name}</p>
 	<p class="text-sm text-slate-200 text-right w-16 whitespace-nowrap overflow-hidden text-ellipsis">
 		{version}
 	</p>

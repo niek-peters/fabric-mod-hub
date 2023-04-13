@@ -37,7 +37,9 @@
 			? 'bg-zinc-700/80'
 			: 'bg-zinc-700/20 hover:bg-zinc-700/50'}"
 		href="/install/{id}"
-		>{name}
+		><p class="whitespace-nowrap overflow-hidden text-ellipsis {premade ? 'w-80 ' : 'w-64'}">
+			{name}
+		</p>
 		<Fa icon={faCaretRight} class="text-3xl" />
 	</a>
 	{#if !premade}

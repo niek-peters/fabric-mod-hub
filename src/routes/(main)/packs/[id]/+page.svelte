@@ -36,9 +36,13 @@
 	<div class="flex flex-col gap-8 w-full h-full">
 		<div class="flex flex-col gap-4">
 			<div class="flex gap-4 items-center">
-				<h1 class="text-4xl">{modpackJoin.name}</h1>
+				<h1 class="title text-4xl whitespace-nowrap overflow-hidden text-ellipsis">
+					{modpackJoin.name}
+				</h1>
 				<Fa icon={faMinus} class="text-lg text-slate-200" />
-				<p class="text-xl text-slate-200">{modpackJoin.game_version}</p>
+				<p class="text-xl text-slate-200 whitespace-nowrap overflow-hidden text-ellipsis w-36">
+					{modpackJoin.game_version}
+				</p>
 			</div>
 			<div class="relative flex gap-4 w-full h-8">
 				<span
@@ -112,3 +116,9 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.title {
+		max-width: 36rem;
+	}
+</style>

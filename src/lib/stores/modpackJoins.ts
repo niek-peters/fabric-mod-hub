@@ -30,8 +30,6 @@ export async function loadFromVersionId(versionId: number) {
 		modpackJoin.loaded = true;
 		return joins;
 	});
-
-	console.log(get(modpackJoins));
 }
 
 export async function unload() {
