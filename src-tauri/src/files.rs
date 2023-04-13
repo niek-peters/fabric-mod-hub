@@ -1,11 +1,16 @@
+pub mod fabric_loader;
+pub mod launcher_profile;
 pub mod mod_versions;
 pub mod modpack_versions;
 
 use std::{
+    collections::HashMap,
     env::{self, consts::OS},
     fs,
     path::PathBuf,
 };
+
+use serde::{Deserialize, Serialize};
 
 const MINECRAFT_FOLDER_CONTENTS: [&str; 6] = [
     "assets",
@@ -15,6 +20,21 @@ const MINECRAFT_FOLDER_CONTENTS: [&str; 6] = [
     "options.txt",
     "launcher_profiles.json",
 ];
+
+#[derive(Serialize, Deserialize)]
+pub struct LauncherProfiles {
+    pub profiles: HashMap<String, LauncherProfile>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LauncherProfile {
+    pub created: String,
+    pub icon: String,
+    pub last_used: String,
+    pub last_version_id: String,
+    pub name: String,
+    pub r#type: String,
+}
 
 pub fn get_data_path(app_handle: &tauri::AppHandle) -> PathBuf {
     let data_dir: PathBuf;
@@ -49,6 +69,21 @@ pub fn get_minecraft_path() -> Result<PathBuf, String> {
 
         fs::create_dir_all(&dir)
             .expect(format!("Should create minecraft versions directory: {:?}", &dir).as_str());
+
+        dir.pop();
+
+        dir.push("launcher_profiles.json");
+
+        if !dir.exists() {
+            fs::write(
+                &dir,
+                serde_json::to_string_pretty(&LauncherProfiles {
+                    profiles: HashMap::new(),
+                })
+                .unwrap(),
+            )
+            .expect(format!("Should create launcher_profiles.json: {:?}", &dir).as_str());
+        }
 
         dir.pop();
 

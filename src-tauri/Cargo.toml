@@ -28,6 +28,7 @@ r2d2 = "0.8.10"
 uuid = {version = "1.3.0", features = ["v4", "fast-rng"] }
 async-recursion = "1.0.2"
 dirs = "4.0.0"
+time = { version = "0.3.20", features = ["formatting"] }
 
 [features]
 # by default Tauri runs in production mode

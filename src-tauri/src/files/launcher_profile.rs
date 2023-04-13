@@ -1,0 +1,56 @@
+use std::{error::Error, fs, path::PathBuf, time::SystemTime};
+
+use time::{format_description, OffsetDateTime};
+
+use super::LauncherProfiles;
+
+pub fn add_profile(path: &PathBuf, game_version: String) -> Result<(), Box<dyn Error>> {
+    // Read the launcher_profiles.json file
+    let text = fs::read_to_string(path)?;
+    let mut json = serde_json::from_str::<LauncherProfiles>(&text)?;
+
+    let profile_name = format!("FabricModHub-{}", game_version);
+
+    // Create the new profile (or update the existing one)
+    let date: OffsetDateTime = SystemTime::now().into();
+    let formatter =
+        format_description::parse("[year]-[month]-[day]T[hour]:[minute]:[second].000Z").unwrap();
+    let date = date.format(&formatter)?;
+
+    let profile = super::LauncherProfile {
+        created: date.clone(),
+        icon: "data:image/png;base64,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".to_string(),
+        last_used: date,
+        last_version_id: profile_name.clone(),
+        name: "Fabric Mod Hub".to_string(),
+        r#type: "custom".to_string(),
+    };
+    json.profiles.insert(profile_name, profile);
+
+    // Write the launcher_profiles.json file
+    fs::write(path, serde_json::to_string_pretty(&json).unwrap())?;
+
+    Ok(())
+}
+
+pub fn remove_profiles(path: &PathBuf) -> Result<(), Box<dyn Error>> {
+    // Remove all profiles with a key containing "FabricModHub"
+    let text = fs::read_to_string(path).unwrap();
+    let mut json = serde_json::from_str::<LauncherProfiles>(&text).unwrap();
+
+    let mut keys_to_remove = Vec::new();
+    for (key, _) in json.profiles.iter() {
+        if key.contains("FabricModHub") {
+            keys_to_remove.push(key.clone());
+        }
+    }
+
+    for key in keys_to_remove {
+        json.profiles.remove(&key);
+    }
+
+    // Write the launcher_profiles.json file
+    fs::write(path, serde_json::to_string_pretty(&json).unwrap())?;
+
+    Ok(())
+}

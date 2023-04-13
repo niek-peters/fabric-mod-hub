@@ -86,7 +86,19 @@
 					if (!modpackJoin) return;
 
 					if (modpackJoin.loaded) unload();
-					else loadFromVersionId(modpackJoin.id);
+					else {
+						toast.promise(
+							loadFromVersionId(modpackJoin.id),
+							{
+								loading: 'Loading...',
+								success: 'Loaded!',
+								error: 'Failed to load modpack'
+							},
+							{
+								style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
+							}
+						);
+					}
 				}}
 				class="flex w-1/2 items-center justify-center px-4 py-2 rounded-md  transition duration-300 {modpackJoin.loaded
 					? 'bg-fuchsia-800 hover:bg-fuchsia-900'

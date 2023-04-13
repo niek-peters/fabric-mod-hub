@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 
 use crate::{
     database::{
@@ -6,7 +6,7 @@ use crate::{
         joins::{ModJoin, ModpackJoin},
         models::{Mod, Modpack, ModpackVersion, NotSaved, Saved, Settings},
     },
-    files,
+    files::{self, fabric_loader, launcher_profile},
     requests::search,
     DbState, ReqState,
 };
@@ -143,18 +143,64 @@ pub fn uninstall_modpack_version(
 }
 
 #[tauri::command]
-pub fn load_modpack_version(
+pub async fn load_modpack_version(
     id: i64,
     app_handle: tauri::AppHandle,
+    client: tauri::State<'_, ReqState>,
     db: tauri::State<'_, DbState>,
 ) -> Result<(), String> {
+    let client = &client.0;
     let mut db = database::get_conn(db);
+
+    let game_version = ModpackVersion::get(&db, id)
+        .expect(format!("Should get the modpack version related with id: {id}").as_str())
+        .game_version;
+
+    // Create the version folder and its contents
+    let mut version_path = files::get_minecraft_path().map_err(|e| e.to_string())?;
+    version_path.push("versions");
+    version_path.push(format!("FabricModHub-{}", game_version));
+
+    fabric_loader::download(&version_path, game_version.clone(), client)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    // Add the launcher profile
+    let mut launcher_profiles_path = files::get_minecraft_path().map_err(|e| e.to_string())?;
+    launcher_profiles_path.push("launcher_profiles.json");
+
+    launcher_profile::add_profile(&launcher_profiles_path, game_version)
+        .map_err(|e| e.to_string())?;
+
+    // Load the mod files for the modpack version
     ModpackVersion::load(id, &app_handle, &mut db).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn unload_modpack_versions(db: tauri::State<'_, DbState>) -> Result<(), String> {
     let db = database::get_conn(db);
+
+    // Remove all version folders containing "FabricModHub"
+    let mut version_path = files::get_minecraft_path().map_err(|e| e.to_string())?;
+    version_path.push("versions");
+    let paths = fs::read_dir(&version_path).map_err(|e| e.to_string())?;
+    for path in paths {
+        let path = path.map_err(|e| e.to_string())?;
+        let path = path.path();
+        if path.is_dir() {
+            let path = path.to_str().unwrap();
+            if path.contains("FabricModHub") {
+                fs::remove_dir_all(path).map_err(|e| e.to_string())?;
+            }
+        }
+    }
+
+    // Remove all launcher profiles containing "FabricModHub"
+    let mut launcher_profiles_path = files::get_minecraft_path().map_err(|e| e.to_string())?;
+    launcher_profiles_path.push("launcher_profiles.json");
+    launcher_profile::remove_profiles(&launcher_profiles_path).map_err(|e| e.to_string())?;
+
+    // Unload all mod files for the modpack versions
     ModpackVersion::unload_all(&db).map_err(|e| e.to_string())
 }
 

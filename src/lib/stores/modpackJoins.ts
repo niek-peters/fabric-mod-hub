@@ -18,8 +18,6 @@ export function fromVersionId(versionId: number): ModpackJoin {
 }
 
 export async function loadFromVersionId(versionId: number) {
-	console.log('Loading...');
-
 	await invoke('load_modpack_version', { id: versionId });
 
 	modpackJoins.update((joins) => {
