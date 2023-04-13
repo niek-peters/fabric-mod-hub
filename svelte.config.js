@@ -20,7 +20,7 @@ const config = {
 			$components: 'src/lib/components'
 		},
 		prerender: {
-			entries: ['*', '/packs/[id]']
+			entries: ['*', '/packs/[id]', '/install/[id]']
 		}
 	}
 };
