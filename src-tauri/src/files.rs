@@ -24,9 +24,12 @@ const MINECRAFT_FOLDER_CONTENTS: [&str; 6] = [
 #[derive(Serialize, Deserialize)]
 pub struct LauncherProfiles {
     pub profiles: HashMap<String, LauncherProfile>,
+    pub settings: LauncherSettings,
+    pub version: u32,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct LauncherProfile {
     pub created: String,
     pub icon: String,
@@ -34,6 +37,22 @@ pub struct LauncherProfile {
     pub last_version_id: String,
     pub name: String,
     pub r#type: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LauncherSettings {
+    pub crash_assistance: bool,
+    pub enable_advanced: bool,
+    pub enable_analytics: bool,
+    pub enable_historical: bool,
+    pub enable_releases: bool,
+    pub enable_snapshots: bool,
+    pub keep_launcher_open: bool,
+    pub profile_sorting: String,
+    pub show_game_log: bool,
+    pub show_menu: bool,
+    pub sound_on: bool,
 }
 
 pub fn get_data_path(app_handle: &tauri::AppHandle) -> PathBuf {
@@ -54,7 +73,7 @@ pub fn get_data_path(app_handle: &tauri::AppHandle) -> PathBuf {
     data_dir
 }
 
-pub fn get_minecraft_path() -> Result<PathBuf, String> {
+pub fn get_default_minecraft_path() -> Result<PathBuf, String> {
     if is_dev() {
         let mut dir = PathBuf::from("data/.minecraft/");
 
@@ -79,6 +98,20 @@ pub fn get_minecraft_path() -> Result<PathBuf, String> {
                 &dir,
                 serde_json::to_string_pretty(&LauncherProfiles {
                     profiles: HashMap::new(),
+                    settings: LauncherSettings {
+                        crash_assistance: true,
+                        enable_advanced: false,
+                        enable_analytics: true,
+                        enable_historical: false,
+                        enable_releases: true,
+                        enable_snapshots: false,
+                        keep_launcher_open: false,
+                        profile_sorting: "ByLastPlayed".to_string(),
+                        show_game_log: false,
+                        show_menu: false,
+                        sound_on: false,
+                    },
+                    version: 3,
                 })
                 .unwrap(),
             )
