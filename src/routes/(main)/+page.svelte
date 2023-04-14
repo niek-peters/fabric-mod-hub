@@ -2,7 +2,7 @@
 	import { open } from '@tauri-apps/api/shell';
 
 	import Fa from 'svelte-fa';
-	import { faMinus, faPlus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+	import { faMinus, faPlus, faUpRightFromSquare, faEye } from '@fortawesome/free-solid-svg-icons';
 	import { faGithub } from '@fortawesome/free-brands-svg-icons';
 	import { modpackJoins, unload } from '$stores/modpackJoins';
 
@@ -36,13 +36,13 @@
 					<a
 						href="/packs/{loadedModpack.id}"
 						class="flex items-center gap-4 px-4 flex-grow bg-indigo-800 hover:bg-indigo-900 transition duration-300 rounded-md shadow-2xl"
-						><Fa class="text-lg" icon={faUpRightFromSquare} />
+						><Fa class="text-lg w-4" icon={faEye} />
 						<p>View</p></a
 					>
 					<button
 						on:click={unload}
 						class="flex items-center gap-4 px-4 flex-grow bg-fuchsia-800 hover:bg-fuchsia-900 transition duration-300 rounded-md shadow-2xl"
-						><Fa class="text-lg" icon={faMinus} />
+						><Fa class="text-lg w-4" icon={faMinus} />
 						<p>Unload</p></button
 					>
 				</section>

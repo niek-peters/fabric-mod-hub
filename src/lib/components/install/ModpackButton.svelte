@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 
 	import Fa from 'svelte-fa';
-	import { faCaretRight, faUpRightFromSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
+	import { faCaretRight, faTrash, faEye } from '@fortawesome/free-solid-svg-icons';
 
 	import { modpackJoins, remove, unload } from '$stores/modpackJoins';
 
@@ -52,7 +52,7 @@
 	<a
 		href="/packs/{id}"
 		class="flex flex-col items-center justify-center gap-1 h-14 w-14 bg-indigo-800 hover:bg-indigo-900 transition duration-300 rounded-md shadow-2xl"
-		><Fa class="text-lg" icon={faUpRightFromSquare} />
-		<p class="-mb-1 text-sm">Info</p></a
+		><Fa class="text-lg" icon={faEye} />
+		<p class="-mb-1 text-sm">View</p></a
 	>
 </div>
