@@ -11,8 +11,12 @@
 	import Transition from '$components/install/Transition.svelte';
 	import ModpackButton from '$components/install/ModpackButton.svelte';
 	import AddOverlay from '$components/install/AddOverlay.svelte';
+	import EditOverlay from '$components/install/EditOverlay.svelte';
+	import ViewOverlay from '$components/install/ViewOverlay.svelte';
 
 	import { adding, startAdding } from '$stores/addState';
+	import { editing } from '$stores/editState';
+	import { viewing } from '$stores/viewState';
 
 	import type { LayoutData } from './$types';
 	export let data: LayoutData;
@@ -34,6 +38,13 @@
 		});
 
 		if ($page.params.id === id.toString()) goto('/install');
+	}
+
+	function update(updatedModpack: Modpack) {
+		custom = custom.map((modpack) => {
+			if (modpack.id === updatedModpack.id) return updatedModpack;
+			return modpack;
+		});
 	}
 </script>
 
@@ -60,12 +71,7 @@
 			<div class="customs flex flex-col gap-4 overflow-y-auto {custom.length > 4 ? 'pr-2' : ''}">
 				{#if custom.length}
 					{#each custom as modpack}
-						<ModpackButton
-							id={modpack.id}
-							name={modpack.name}
-							premade={false}
-							deleteFunction={deleteCustom}
-						/>
+						<ModpackButton id={modpack.id} name={modpack.name} premade={false} />
 					{/each}
 				{:else}
 					<div class="w-full h-24 flex items-center justify-center">
@@ -85,6 +91,10 @@
 	</div>
 	{#if $adding}
 		<AddOverlay updateList={addCustom} />
+	{:else if $editing}
+		<EditOverlay updateList={update} deleteFunction={deleteCustom} />
+	{:else if $viewing}
+		<ViewOverlay />
 	{/if}
 </div>
 

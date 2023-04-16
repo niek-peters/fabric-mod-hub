@@ -1,3 +1,4 @@
+use reqwest::Client;
 use rusqlite::{params, Connection, Result};
 use std::error::Error;
 use std::marker::PhantomData;
@@ -92,6 +93,30 @@ impl Modpack<NotSaved> {
 }
 
 impl Modpack<Saved> {
+    pub fn update(
+        self,
+        name: String,
+        slug: String,
+        db: &mut Connection,
+    ) -> Result<Modpack<Saved>, Box<dyn Error>> {
+        let update_modpack = include_str!("../../../../sql/modpacks/update.sql");
+
+        let tx = db.transaction()?;
+
+        tx.execute(update_modpack, params![name, slug, self.id.unwrap()])?;
+
+        tx.commit()?;
+
+        Ok(Modpack {
+            id: self.id,
+            name,
+            slug,
+            premade: self.premade,
+            mods: self.mods,
+            state: PhantomData::<Saved>,
+        })
+    }
+
     pub fn delete(self, db: &mut Connection) -> Result<(), Box<dyn Error>> {
         let delete_modpack = include_str!("../../../../sql/modpacks/delete.sql");
 

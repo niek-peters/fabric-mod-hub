@@ -1,0 +1,1 @@
+UPDATE modpacks SET name = ?1, slug = ?2 WHERE id = ?3;

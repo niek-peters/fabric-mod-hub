@@ -53,6 +53,29 @@ declare global {
 		premade: boolean;
 	};
 
+	type MixedMod = {
+		id: number | null;
+		project_id: string;
+		name: string;
+		slug: string;
+		page_url: string;
+	};
+
+	type AddModpack = {
+		modpack: NewModpack;
+		mods: NewMod[];
+	};
+
+	type EditModpack = {
+		modpack: Modpack;
+		mods: MixedMod[];
+	};
+
+	type ViewModpack = {
+		modpack: Modpack;
+		mods: Mod[];
+	};
+
 	type Settings = {
 		id: number;
 		minecraft_dir: string;

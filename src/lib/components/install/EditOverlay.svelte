@@ -3,6 +3,7 @@
 	import { open } from '@tauri-apps/api/shell';
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 
 	import Fa from 'svelte-fa';
 	import {
@@ -11,22 +12,23 @@
 		faCaretLeft,
 		faCube,
 		faUpRightFromSquare,
-		faPlus
+		faSave
 	} from '@fortawesome/free-solid-svg-icons';
 	import toast from 'svelte-french-toast';
 
 	import {
-		adding,
+		editing,
 		addMod,
-		addState,
+		editState,
 		removeMod,
-		resetAddState,
-		setTitle,
-		stopAdding
-	} from '$stores/addState';
+		resetEditState,
+		stopEditing
+	} from '$src/lib/stores/editState';
 	import VerLine from '../VerLine.svelte';
+	import { modpackJoins, remove, unload } from '$src/lib/stores/modpackJoins';
 
 	export let updateList: (newModpack: Modpack) => void;
+	export let deleteFunction: (id: number) => void = () => {};
 
 	let searchEl: HTMLInputElement;
 	let formEl: HTMLFormElement;
@@ -36,27 +38,29 @@
 	let filteredResults: NewMod[] = [];
 	$: {
 		filteredResults = results.filter((mod) => {
-			return !$addState.mods.find((addedMod) => addedMod.project_id === mod.project_id);
+			return !$editState.mods.find((addedMod) => addedMod.project_id === mod.project_id);
 		});
 	}
 	let helpHover = false;
 
-	let name: string;
+	let originalMods: Mod[] = [];
 
 	let noMods = false;
 	$: {
-		if ($addState.mods.length) noMods = false;
+		if ($editState.mods.length) noMods = false;
 	}
 	let showNoMods = false;
+
+	$: console.log($editState.mods);
 
 	onMount(() => {
 		searchEl.focus();
 		search();
 
-		name = $addState.modpack.name;
+		originalMods = structuredClone($editState.mods) as Mod[];
 
 		window.addEventListener('click', () => {
-			stopAdding();
+			stopEditing();
 		});
 	});
 
@@ -69,17 +73,56 @@
 		}
 	}
 
-	async function submit() {
-		const modpack = (await invoke('add_modpack', {
-			name: $addState.modpack.name,
-			slug: $addState.modpack.slug,
-			projectIds: $addState.mods.map((mod) => mod.project_id)
+	async function save() {
+		const removedMods = originalMods.filter(
+			(mod) => !$editState.mods.find((addedMod) => addedMod.project_id === mod.project_id)
+		);
+		const newMods = $editState.mods.filter(
+			(mod) => !originalMods.find((addedMod) => addedMod.project_id === mod.project_id)
+		);
+
+		const modpack = (await invoke('update_modpack', {
+			id: $editState.modpack.id,
+			name: $editState.modpack.name,
+			slug: $editState.modpack.slug,
+			removedModIds: removedMods.map((mod) => mod.id),
+			newProjectIds: newMods.map((mod) => mod.project_id)
 		})) as Modpack;
+
+		// Get all related modpack joins
+		const joins = $modpackJoins.filter((join) => join.modpack_id === $editState.modpack.id);
+
+		// Uninstall all modpack joins
+		for (const join of joins) {
+			if (join.loaded) unload();
+			await invoke('uninstall_modpack_version', { id: join.id });
+			await remove(join.id);
+		}
 
 		updateList(modpack);
 
-		resetAddState();
-		stopAdding();
+		resetEditState();
+		stopEditing();
+
+		await goto('/install');
+	}
+
+	async function deleteModpack() {
+		// Get all related modpack joins
+		const joins = $modpackJoins.filter((join) => join.modpack_id === $editState.modpack.id);
+
+		// Uninstall all modpack joins
+		for (const join of joins) {
+			if (join.loaded) unload();
+			await invoke('uninstall_modpack_version', { id: join.id });
+			await remove(join.id);
+		}
+
+		await invoke('delete_modpack', { id: $editState.modpack.id });
+		deleteFunction($editState.modpack.id);
+
+		resetEditState();
+		stopEditing();
 	}
 </script>
 
@@ -87,32 +130,28 @@
 <section
 	in:fly={{ y: -50, duration: 250 }}
 	out:fly={{ y: -50, duration: 250 }}
-	class="absolute w-full h-full p-4 {$adding ? 'pointer-events-auto' : 'pointer-events-none'}"
+	class="absolute w-full h-full p-4 {$editing ? 'pointer-events-auto' : 'pointer-events-none'}"
 >
 	<div
 		on:click|stopPropagation
 		class="relative flex flex-col h-full p-4 gap-4 bg-zinc-700 shadow-2xl rounded-md"
 	>
 		<div class="flex justify-between items-center">
-			<h2 class="text-2xl">Create a modpack</h2>
+			<h2 class="text-2xl">Edit modpack</h2>
 			<div class="flex gap-8">
 				<button
-					on:click={stopAdding}
+					on:click={stopEditing}
 					class="flex gap-2 items-center text-zinc-300 hover:text-zinc-400 transition duration-300"
 				>
 					<Fa icon={faCaretLeft} class="text-2xl" />
 					Close
 				</button>
 				<button
-					on:click={() => {
-						name = '';
-						resetAddState();
-						searchEl.focus();
-					}}
+					on:click={deleteModpack}
 					class="flex gap-2 items-center text-rose-500 hover:text-rose-600 transition duration-300"
 				>
 					<Fa icon={faTrash} />
-					Reset
+					Delete
 				</button>
 			</div>
 		</div>
@@ -213,18 +252,14 @@
 			<form
 				class="flex flex-col flex-grow gap-4 h-full w-1/2"
 				on:submit|preventDefault={async () => {
-					if (!$addState.mods.length && !noMods) noMods = true;
-					else if (await invoke('check_slug_exists', { slug: $addState.modpack.slug })) {
-						toast.error('Modpack name was taken', {
-							style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
-						});
-					} else {
+					if (!$editState.mods.length && !noMods) noMods = true;
+					else {
 						toast.promise(
-							submit(),
+							save(),
 							{
-								loading: 'Creating modpack...',
-								success: 'Modpack added!',
-								error: 'Failed to create modpack'
+								loading: 'Saving modpack...',
+								success: 'Modpack saved!',
+								error: 'Failed to save modpack'
 							},
 							{
 								style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
@@ -241,19 +276,16 @@
 					minlength="1"
 					maxlength="32"
 					required
-					bind:value={name}
-					on:input={() => {
-						setTitle(name);
-					}}
+					bind:value={$editState.modpack.name}
 				/>
-				<div class="list overflow-y-auto -ml-4 pl-4 {$addState.mods.length > 7 ? 'pr-2' : ''}">
+				<div class="list overflow-y-auto -ml-4 pl-4 {$editState.mods.length > 7 ? 'pr-2' : ''}">
 					<div class="list-child flex flex-col w-full gap-2 bg-zinc-800/20 rounded-md p-2">
-						{#if $addState.mods.length === 0}
+						{#if $editState.mods.length === 0}
 							<p class="text-lg my-auto text-center text-zinc-200">
 								Add a mod using the search bar
 							</p>
 						{/if}
-						{#each $addState.mods as mod}
+						{#each $editState.mods as mod}
 							{@const iconUrl = `https://cdn.modrinth.com/data/${mod.project_id}/icon.png`}
 							{@const iconId = `icon2-${mod.project_id}`}
 							<button
@@ -315,7 +347,7 @@
 						class="flex items-center justify-center w-full gap-2 px-4 py-2 rounded-md transition duration-300 {noMods
 							? 'bg-rose-800 hover:bg-rose-900'
 							: 'bg-creeper/80 hover:bg-creeper/60'}"
-						><Fa icon={faPlus} />{noMods ? 'Create empty modpack' : 'Add modpack'}</button
+						><Fa icon={faSave} />{noMods ? 'Save empty modpack' : 'Save modpack'}</button
 					>
 				</div>
 			</form>

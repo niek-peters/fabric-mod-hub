@@ -1,0 +1,1 @@
+SELECT id, project_id, name, slug, page_url FROM mods WHERE id = ?1;

@@ -4,7 +4,7 @@ use crate::{
     database::{
         self,
         joins::{ModJoin, ModpackJoin},
-        models::{Mod, Modpack, ModpackVersion, NotSaved, Saved, Settings},
+        models::{Mod, Modpack, ModpackMod, ModpackVersion, NotSaved, Saved, Settings},
     },
     files::{self, fabric_loader, launcher_profile},
     requests::search,
@@ -15,6 +15,12 @@ use crate::{
 pub fn get_modpack(id: i64, db: tauri::State<'_, DbState>) -> Result<Modpack<Saved>, String> {
     let db = database::get_conn(db);
     Modpack::get(&db, id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_modpack_mods(id: i64, db: tauri::State<'_, DbState>) -> Result<Vec<Mod<Saved>>, String> {
+    let db = database::get_conn(db);
+    Mod::get_by_modpack_id(id, &db).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -82,6 +88,44 @@ pub async fn add_modpack(
     Modpack::create(&client, &mut db, name, slug, false, project_ids)
         .await
         .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn update_modpack(
+    id: i64,
+    name: String,
+    slug: String,
+    removed_mod_ids: Vec<i64>,
+    new_project_ids: Vec<String>,
+    client: tauri::State<'_, ReqState>,
+    db: tauri::State<'_, DbState>,
+) -> Result<Modpack<Saved>, String> {
+    let client = &client.0;
+    let mut db = database::get_conn(db);
+
+    let modpack = Modpack::get(&db, id).map_err(|e| e.to_string())?;
+    let updated_modpack = modpack
+        .update(name, slug, &mut db)
+        .map_err(|e| e.to_string())?;
+
+    // Remove all the mods that are no longer in the modpack
+    for mod_id in removed_mod_ids {
+        let mod1 = Mod::get(mod_id, &db).map_err(|e| e.to_string())?;
+        mod1.delete(&mut db).map_err(|e| e.to_string())?;
+    }
+
+    // Add all the new mods to the modpack
+    for project_id in new_project_ids {
+        let mod1 = Mod::get_by_project_id(&client, project_id)
+            .await
+            .map_err(|e| e.to_string())?;
+        let mod1 = mod1.save(&mut db).map_err(|e| e.to_string())?;
+
+        let modpack_mod = ModpackMod::new(id, mod1.id.unwrap());
+        modpack_mod.save(&mut db).map_err(|e| e.to_string())?;
+    }
+
+    Ok(updated_modpack)
 }
 
 #[tauri::command]

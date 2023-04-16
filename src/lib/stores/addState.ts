@@ -1,10 +1,5 @@
 import { writable } from 'svelte/store';
 
-export type AddModpack = {
-	modpack: NewModpack;
-	mods: NewMod[];
-};
-
 const defaultState: AddModpack = {
 	modpack: {
 		id: null,

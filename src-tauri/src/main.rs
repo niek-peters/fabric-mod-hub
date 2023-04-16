@@ -54,11 +54,13 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_modpack,
+            commands::get_modpack_mods,
             commands::get_all_modpacks,
             commands::get_all_modpack_joins,
             commands::get_modpack_game_versions,
             commands::check_slug_exists,
             commands::add_modpack,
+            commands::update_modpack,
             commands::delete_modpack,
             commands::get_mod_joins,
             commands::install_modpack_version,
