@@ -21,9 +21,10 @@ impl ModpackVersion {
             Ok(ModpackVersion {
                 id: row.get(0)?,
                 modpack_id: row.get(1)?,
-                game_version: row.get(2)?,
-                installed: row.get(3)?,
-                loaded: row.get(4)?,
+                custom_name: row.get(2)?,
+                game_version: row.get(3)?,
+                installed: row.get(4)?,
+                loaded: row.get(5)?,
                 state: PhantomData::<Saved>,
             })
         })?;

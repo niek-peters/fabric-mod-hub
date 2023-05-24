@@ -64,7 +64,7 @@
 				<h1 class="text-xl">Your modpacks</h1>
 				<button
 					on:click|stopPropagation={startAdding}
-					class="flex gap-2 items-center bg-creeper/80 hover:bg-creeper/60 transition duration-300 px-2 py-1 rounded-md"
+					class="flex gap-2 items-center bg-creeper/80 hover:bg-creeper/60 transition duration-300 px-2 py-1 rounded-md shadow-2xl"
 					><Fa icon={faPlus} /> Add new
 				</button>
 			</div>

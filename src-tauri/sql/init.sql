@@ -10,11 +10,19 @@ CREATE TABLE IF NOT EXISTS modpacks (
 CREATE TABLE IF NOT EXISTS modpack_versions (
     id INTEGER PRIMARY KEY NOT NULL,
     modpack_id INTEGER NOT NULL,
+    custom_name VARCHAR(63),
     game_version VARCHAR(63) NOT NULL,
     installed BOOLEAN NOT NULL DEFAULT FALSE,
     loaded BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (modpack_id) REFERENCES modpacks(id) ON DELETE CASCADE,
     CONSTRAINT modpack_version_unique UNIQUE (modpack_id, game_version)
+);
+
+CREATE TABLE IF NOT EXISTS custom_files (
+    id INTEGER PRIMARY KEY NOT NULL,
+    modpack_version_id INTEGER NOT NULL,
+    filename VARCHAR(255) UNIQUE NOT NULL,
+    FOREIGN KEY (modpack_version_id) REFERENCES modpack_versions(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS modpack_mods (

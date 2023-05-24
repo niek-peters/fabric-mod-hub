@@ -1,0 +1,1 @@
+DELETE FROM custom_files WHERE id = ?1;

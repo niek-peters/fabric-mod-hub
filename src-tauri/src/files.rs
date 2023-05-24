@@ -1,3 +1,4 @@
+pub mod custom_files;
 pub mod fabric_loader;
 pub mod launcher_profile;
 pub mod mod_versions;

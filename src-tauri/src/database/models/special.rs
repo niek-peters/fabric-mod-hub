@@ -1,3 +1,4 @@
+pub mod custom_files;
 pub mod mod_versions;
 pub mod modpack_versions;
 pub mod modpacks;

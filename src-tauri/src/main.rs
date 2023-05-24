@@ -67,6 +67,8 @@ fn main() {
             commands::uninstall_modpack_version,
             commands::load_modpack_version,
             commands::unload_modpack_versions,
+            commands::update_modpack_version,
+            commands::get_modpack_version_custom_filepaths,
             commands::search,
             commands::init_settings,
             commands::get_settings,

@@ -1,10 +1,12 @@
 use std::{fs, path::PathBuf};
 
+use tauri::api::file;
+
 use crate::{
     database::{
         self,
         joins::{ModJoin, ModpackJoin},
-        models::{Mod, Modpack, ModpackMod, ModpackVersion, NotSaved, Saved, Settings},
+        models::{CustomFile, Mod, Modpack, ModpackMod, ModpackVersion, NotSaved, Saved, Settings},
     },
     files::{self, fabric_loader, launcher_profile},
     requests::search,
@@ -248,6 +250,87 @@ pub fn unload_modpack_versions(db: tauri::State<'_, DbState>) -> Result<(), Stri
 
     // Unload all mod files for the modpack versions
     ModpackVersion::unload_all(&db).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn update_modpack_version(
+    id: i64,
+    custom_name: Option<String>,
+    removed_filepaths: Vec<String>,
+    new_filepaths: Vec<String>,
+    app_handle: tauri::AppHandle,
+    db: tauri::State<'_, DbState>,
+) -> Result<ModpackVersion<Saved>, String> {
+    let mut db = database::get_conn(db);
+
+    let modpack_version = ModpackVersion::get(&db, id).map_err(|e| e.to_string())?;
+    let updated_modpack_version = modpack_version
+        .update(custom_name, &mut db)
+        .map_err(|e| e.to_string())?;
+
+    // Remove all the files that are no longer in the modpack version
+    let removed_filenames = removed_filepaths
+        .iter()
+        .map(|p| {
+            PathBuf::from(p)
+                .file_name()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_string()
+        })
+        .collect::<Vec<String>>();
+    let files = CustomFile::get_from_modpack_version_id(id, &db).map_err(|e| e.to_string())?;
+    for file in files {
+        if removed_filenames.contains(&file.filename) {
+            file.remove_from_modpack_version(id, &app_handle)
+                .map_err(|e| e.to_string())?;
+            file.delete(&mut db).map_err(|e| e.to_string())?;
+        }
+    }
+
+    // Add all the new custom files to the modpack version
+    for filepath in new_filepaths {
+        // Use the filename as the custom file name
+        let filename = PathBuf::from(&filepath)
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+
+        let custom_file = CustomFile::new(id, filename);
+        let custom_file = custom_file.save(&mut db).map_err(|e| e.to_string())?;
+        custom_file
+            .add_to_modpack_version(filepath, id, &app_handle)
+            .map_err(|e| e.to_string())?;
+    }
+
+    Ok(updated_modpack_version)
+}
+
+#[tauri::command]
+pub async fn get_modpack_version_custom_filepaths(
+    id: i64,
+    app_handle: tauri::AppHandle,
+    db: tauri::State<'_, DbState>,
+) -> Result<Vec<String>, String> {
+    let db = database::get_conn(db);
+
+    let files = CustomFile::get_from_modpack_version_id(id, &db).map_err(|e| e.to_string())?;
+    // Get all filepaths for this modpack version using the custom files's get_path method
+    let mut filepaths = Vec::new();
+    for file in files {
+        filepaths.push(
+            file.get_path(id, &app_handle)
+                .map_err(|e| e.to_string())?
+                .to_str()
+                .unwrap()
+                .to_string(),
+        );
+    }
+
+    Ok(filepaths)
 }
 
 #[tauri::command]

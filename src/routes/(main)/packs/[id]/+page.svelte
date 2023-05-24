@@ -3,7 +3,7 @@
 	import { invoke } from '@tauri-apps/api/tauri';
 
 	import Fa from 'svelte-fa';
-	import { faMinus, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+	import { faMinus, faUpRightFromSquare, faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 	import toast from 'svelte-french-toast';
 
 	import type { PageData } from './$types';
@@ -35,14 +35,20 @@
 {#if modpackJoin}
 	<div class="flex flex-col gap-8 w-full h-full">
 		<div class="flex flex-col gap-4">
-			<div class="flex gap-4 items-center">
-				<h1 class="title text-4xl whitespace-nowrap overflow-hidden text-ellipsis">
-					{modpackJoin.name}
-				</h1>
-				<Fa icon={faMinus} class="text-lg text-slate-200" />
-				<p class="text-xl text-slate-200 whitespace-nowrap overflow-hidden text-ellipsis w-36">
-					{modpackJoin.game_version}
-				</p>
+			<div class="flex justify-between">
+				<div class="flex gap-4 items-center">
+					<h1 class="title text-4xl whitespace-nowrap overflow-hidden text-ellipsis">
+						{modpackJoin.name}
+					</h1>
+					<Fa icon={faMinus} class="text-lg text-slate-200" />
+					<p class="text-xl text-slate-200 whitespace-nowrap overflow-hidden text-ellipsis w-36">
+						{modpackJoin.game_version}
+					</p>
+				</div>
+				<button
+					class="flex items-center gap-2 text-indigo-400 hover:text-indigo-500 transition duration-300"
+					><Fa class="text-lg" icon={faPen} />Edit modpack</button
+				>
 			</div>
 			<div class="relative flex gap-4 w-full h-8">
 				<span
@@ -86,31 +92,19 @@
 		</div>
 		<div class="flex gap-4">
 			<button
-				on:click={() => {
+				on:click={async () => {
 					if (!modpackJoin) return;
 
 					if (modpackJoin.loaded) unload();
-					else {
-						toast.promise(
-							loadFromVersionId(modpackJoin.id),
-							{
-								loading: 'Loading...',
-								success: 'Loaded!',
-								error: 'Failed to load modpack'
-							},
-							{
-								style: 'background-color: #52525b; color: #e4e4e7; border-radius: 0.375rem;'
-							}
-						);
-					}
+					else loadFromVersionId(modpackJoin.id);
 				}}
-				class="flex w-1/2 items-center justify-center px-4 py-2 rounded-md  transition duration-300 {modpackJoin.loaded
+				class="flex w-1/2 items-center justify-center px-4 py-2 rounded-md  transition duration-300 shadow-2xl {modpackJoin.loaded
 					? 'bg-fuchsia-800 hover:bg-fuchsia-900'
 					: 'bg-creeper/80 hover:bg-creeper/60'}">{modpackJoin.loaded ? 'Unload' : 'Load'}</button
 			>
 			<button
 				on:click={uninstall}
-				class="flex w-1/2 items-center justify-center px-4 py-2 bg-rose-800 rounded-md hover:bg-rose-900 transition duration-300"
+				class="flex w-1/2 items-center justify-center px-4 py-2 bg-rose-800 rounded-md hover:bg-rose-900 transition duration-300 shadow-2xl"
 				>Uninstall</button
 			>
 		</div>

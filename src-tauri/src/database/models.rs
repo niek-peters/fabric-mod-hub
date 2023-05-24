@@ -59,11 +59,22 @@ pub struct ModpackVersion<State = NotSaved> {
     #[new(default)]
     pub id: Option<i64>,
     pub modpack_id: i64,
+    #[new(default)]
+    pub custom_name: Option<String>,
     pub game_version: String,
     #[new(default)]
     pub installed: bool,
     #[new(default)]
     pub loaded: bool,
+    state: PhantomData<State>,
+}
+
+#[derive(new, Serialize)]
+pub struct CustomFile<State = NotSaved> {
+    #[new(default)]
+    pub id: Option<i64>,
+    pub modpack_version_id: i64,
+    pub filename: String,
     state: PhantomData<State>,
 }
 

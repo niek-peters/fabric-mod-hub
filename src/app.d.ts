@@ -76,6 +76,11 @@ declare global {
 		mods: Mod[];
 	};
 
+	type EditModpackVersion = {
+		custom_name?: string;
+		custom_filepaths: string[];
+	};
+
 	type Settings = {
 		id: number;
 		minecraft_dir: string;

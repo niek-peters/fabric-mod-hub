@@ -1,1 +1,1 @@
-SELECT mv.id, mv.modpack_id, m.name, m.slug, mv.game_version, m.premade, mv.installed, mv.loaded FROM modpacks m INNER JOIN modpack_versions mv ON m.id = mv.modpack_id;
+SELECT mv.id, mv.modpack_id, m.name, mv.custom_name, m.slug, mv.game_version, m.premade, mv.installed, mv.loaded FROM modpacks m INNER JOIN modpack_versions mv ON m.id = mv.modpack_id;

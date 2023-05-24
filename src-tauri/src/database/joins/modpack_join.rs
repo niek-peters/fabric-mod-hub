@@ -12,11 +12,12 @@ impl ModpackJoin {
                     id: row.get(0)?,
                     modpack_id: row.get(1)?,
                     name: row.get(2)?,
-                    slug: row.get(3)?,
-                    game_version: row.get(4)?,
-                    premade: row.get(5)?,
-                    installed: row.get(6)?,
-                    loaded: row.get(7)?,
+                    custom_name: row.get(3)?,
+                    slug: row.get(4)?,
+                    game_version: row.get(5)?,
+                    premade: row.get(6)?,
+                    installed: row.get(7)?,
+                    loaded: row.get(8)?,
                 })
             })
             .unwrap();
@@ -38,11 +39,12 @@ impl ModpackJoin {
     //             id: row.get(0)?,
     //             modpack_id: row.get(1)?,
     //             name: row.get(2)?,
-    //             slug: row.get(3)?,
-    //             game_version: row.get(4)?,
-    //             premade: row.get(5)?,
-    //             installed: row.get(6)?,
-    //             loaded: row.get(7)?,
+    //             custom_name: row.get(3)?,
+    //             slug: row.get(4)?,
+    //             game_version: row.get(5)?,
+    //             premade: row.get(6)?,
+    //             installed: row.get(7)?,
+    //             loaded: row.get(8)?,
     //         })
     //     })?;
 

@@ -21,6 +21,7 @@ pub struct ModpackJoin {
     pub id: i64,
     pub modpack_id: i64,
     pub name: String,
+    pub custom_name: Option<String>,
     pub slug: String,
     pub game_version: String,
     pub premade: bool,

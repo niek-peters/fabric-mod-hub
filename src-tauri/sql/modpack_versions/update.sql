@@ -1,0 +1,1 @@
+UPDATE modpack_versions SET custom_name = ?1 WHERE id = ?2;
