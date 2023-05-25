@@ -15,13 +15,6 @@ export function resetEditState() {
 	editPackState.set(structuredClone(defaultState));
 }
 
-export function setCustomName(custom_name: string) {
-	editPackState.update((state) => {
-		state.custom_name = custom_name;
-		return state;
-	});
-}
-
 export function addFilepath(filepath: string) {
 	editPackState.update((state) => {
 		state.custom_filepaths.push(filepath);

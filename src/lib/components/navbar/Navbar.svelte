@@ -79,7 +79,7 @@
 						{#if modpack.id}
 							<ModButton
 								id={modpack.id}
-								name={modpack.name}
+								name={modpack.custom_name || modpack.name}
 								version={modpack.game_version}
 								loaded={modpack.loaded}
 							/>

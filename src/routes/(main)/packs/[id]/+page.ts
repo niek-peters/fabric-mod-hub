@@ -15,6 +15,8 @@ export const load: PageLoad = async ({ params }) => {
 
 	const res2 = await invoke('get_modpack_version_custom_filepaths', { id });
 
+	console.log(res2);
+
 	let custom_filepaths: string[] = [];
 	if (Array.isArray(res2)) {
 		custom_filepaths = res2;

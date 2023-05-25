@@ -9,6 +9,8 @@
 	import type { PageData } from './$types';
 	import { modpackJoins, loadFromVersionId, unload, remove } from '$stores/modpackJoins';
 	import { goto } from '$app/navigation';
+	import { editingPack, startEditing } from '$src/lib/stores/editPackState';
+	import EditOverlay from '$src/lib/components/packs/EditOverlay.svelte';
 	export let data: PageData;
 
 	$: modpackJoin = $modpackJoins.find((join) => join.id === data.id);
@@ -33,12 +35,14 @@
 </script>
 
 {#if modpackJoin}
-	<div class="flex flex-col gap-8 w-full h-full">
+	<div
+		class="relative flex flex-col gap-8 w-full h-full {$editingPack ? 'pointer-events-none' : ''}"
+	>
 		<div class="flex flex-col gap-4">
 			<div class="flex justify-between">
 				<div class="flex gap-4 items-center">
 					<h1 class="title text-4xl whitespace-nowrap overflow-hidden text-ellipsis">
-						{modpackJoin.name}
+						{modpackJoin.custom_name || modpackJoin.name}
 					</h1>
 					<Fa icon={faMinus} class="text-lg text-slate-200" />
 					<p class="text-xl text-slate-200 whitespace-nowrap overflow-hidden text-ellipsis w-36">
@@ -46,6 +50,7 @@
 					</p>
 				</div>
 				<button
+					on:click={startEditing}
 					class="flex items-center gap-2 text-indigo-400 hover:text-indigo-500 transition duration-300"
 					><Fa class="text-lg" icon={faPen} />Edit modpack</button
 				>
@@ -108,6 +113,9 @@
 				>Uninstall</button
 			>
 		</div>
+		{#if $editingPack}
+			<EditOverlay id={data.id} name={modpackJoin.custom_name || modpackJoin.name} />
+		{/if}
 	</div>
 {/if}
 

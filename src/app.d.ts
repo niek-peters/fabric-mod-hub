@@ -31,6 +31,7 @@ declare global {
 		id: number;
 		modpack_id: number;
 		name: string;
+		custom_name: string;
 		slug: string;
 		game_version: string;
 		premade: boolean;

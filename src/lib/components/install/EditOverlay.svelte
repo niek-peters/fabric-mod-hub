@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invoke } from '@tauri-apps/api/tauri';
 	import { open } from '@tauri-apps/api/shell';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 
@@ -52,16 +52,17 @@
 	let showNoMods = false;
 
 	$: console.log($editState.mods);
-
 	onMount(() => {
 		searchEl.focus();
 		search();
 
 		originalMods = structuredClone($editState.mods) as Mod[];
 
-		window.addEventListener('click', () => {
-			stopEditing();
-		});
+		window.addEventListener('click', stopEditing);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('click', stopEditing);
 	});
 
 	async function search() {

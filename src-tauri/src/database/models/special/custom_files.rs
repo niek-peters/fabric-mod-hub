@@ -13,6 +13,7 @@ impl CustomFile {
             include_str!("../../../../sql/custom_files/get_from_modpack_version_id.sql");
 
         let mut stmt = db.prepare(get_custom_files)?;
+
         let rows = stmt.query_map(params![modpack_version_id], |row| {
             Ok(CustomFile {
                 id: Some(row.get(0)?),
